@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tablero Kanban - Equipo LMS- AMARAM.INC </title>
+    <title>Tablero Kanban - Equipo LMS</title>
     <style>
         :root {
             --bg-body: #ffffff;
@@ -46,7 +46,10 @@
             font-size: 14px;
             font-weight: 600;
             cursor: pointer;
+            transition: background-color 0.2s;
         }
+        
+        .btn-primary:hover { background-color: var(--primary-hover); }
 
         .kanban-board {
             display: flex;
@@ -65,35 +68,17 @@
             display: flex;
             flex-direction: column;
             gap: 12px;
-            transition: background-color 0.2s; /* Suaviza el cambio al arrastrar encima */
+            transition: background-color 0.2s;
         }
 
-        /* Efecto al arrastrar una tarjeta sobre la columna */
-        .kanban-column.drag-over {
-            background-color: #e5e7eb;
-            border: 2px dashed #9ca3af;
-        }
-
+        .kanban-column.drag-over { background-color: #e5e7eb; border: 2px dashed #9ca3af; }
         .kanban-column.review { background-color: var(--bg-col-review); }
         .kanban-column.review.drag-over { background-color: #fde047; }
-
         .kanban-column.done { background-color: var(--bg-col-done); }
         .kanban-column.done.drag-over { background-color: #bbf7d0; }
 
-        .column-header {
-            font-size: 14px;
-            font-weight: 700;
-            margin-bottom: 10px;
-            color: var(--text-dark);
-        }
-
-        .cards-container {
-            flex-grow: 1; /* Permite soltar en toda el área de la columna */
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-            min-height: 50px;
-        }
+        .column-header { font-size: 14px; font-weight: 700; margin-bottom: 10px; color: var(--text-dark); }
+        .cards-container { flex-grow: 1; display: flex; flex-direction: column; gap: 12px; min-height: 50px; }
 
         .kanban-card {
             background: white;
@@ -102,26 +87,14 @@
             box-shadow: 0 1px 3px rgba(0,0,0,0.1);
             border: 1px solid var(--border-card);
             border-left: 4px solid var(--card-border-left);
-            cursor: grab; /* Muestra manito de agarrar */
+            cursor: grab;
             transition: transform 0.1s;
         }
 
-        .kanban-card:active {
-            cursor: grabbing; /* Muestra manito cerrada al arrastrar */
-        }
-
-        .kanban-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-        }
-
-        .kanban-card.dragging {
-            opacity: 0.5; /* Tarjeta semi-transparente mientras se arrastra */
-        }
-
-        .kanban-column.done .kanban-card {
-            border-left-color: var(--card-border-left-done);
-        }
+        .kanban-card:active { cursor: grabbing; }
+        .kanban-card:hover { transform: translateY(-2px); box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        .kanban-card.dragging { opacity: 0.5; }
+        .kanban-column.done .kanban-card { border-left-color: var(--card-border-left-done); }
 
         .card-title { font-size: 13px; font-weight: 700; margin: 0 0 6px 0; line-height: 1.3; }
         .card-desc { font-size: 12px; color: var(--text-muted); margin: 0 0 10px 0; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
@@ -130,13 +103,18 @@
         .card-link-icon { color: #059669; font-weight: bold; display: none; }
         .link-display { margin-top: 10px; font-size: 12px; background: #f0fdf4; padding: 6px; border-radius: 4px; word-break: break-all; display: none; }
 
-        /* Modal Styles */
+        /* Estilos de los Modales */
         .modal-overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); align-items: center; justify-content: center; z-index: 1000; }
-        .modal { background: white; padding: 25px; border-radius: 10px; width: 100%; max-width: 450px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); }
+        .modal { background: white; padding: 25px; border-radius: 10px; width: 100%; max-width: 450px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); max-height: 90vh; overflow-y: auto; }
+        .modal.large { max-width: 600px; }
         .modal h2 { margin: 0 0 15px 0; font-size: 18px; }
-        .form-group { margin-bottom: 15px; }
+        
+        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .form-group { margin-bottom: 0; }
+        .form-group.full-width { grid-column: span 2; }
         .form-group label { display: block; margin-bottom: 5px; font-size: 13px; font-weight: 600;}
-        .form-group select, .form-group input { width: 100%; padding: 8px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 14px; box-sizing: border-box; }
+        .form-group select, .form-group input, .form-group textarea { width: 100%; padding: 8px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 13px; box-sizing: border-box; }
+        
         .modal-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px;}
         .btn-cancel { background: #f3f4f6; color: #374151; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; }
         .btn-save { background: var(--primary); color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; }
@@ -149,11 +127,10 @@
             <h1>Tablero Kanban - Equipo LMS</h1>
             <p>Desarrollo del curso de IA para creación web (Arrastra las tarjetas para moverlas)</p>
         </div>
-        <button class="btn-primary">+ Nueva Tarjeta</button>
+        <button class="btn-primary" onclick="openAddModal()">+ Nueva Tarjeta</button>
     </div>
 
     <div class="kanban-board">
-        <!-- Las columnas ahora tienen el atributo de datos 'data-status' -->
         <div class="kanban-column dropzone" data-status="Backlog" id="col-backlog">
             <div class="column-header">Backlog</div>
             <div class="cards-container"></div>
@@ -180,13 +157,81 @@
         </div>
     </div>
 
-    <!-- Modal para editar la tarjeta (Links y Estado manual) -->
+    <!-- Modal para Agregar NUEVA Actividad (Basado en la tabla) -->
+    <div class="modal-overlay" id="addModal">
+        <div class="modal large">
+            <h2>Agregar Nueva Actividad</h2>
+            <form id="addCardForm" onsubmit="event.preventDefault(); addNewCard();">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>ID</label>
+                        <input type="text" id="add-id" placeholder="Ej: S6-01" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Sprint</label>
+                        <input type="text" id="add-sprint" placeholder="Ej: Sprint 6" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Corte</label>
+                        <input type="text" id="add-corte" placeholder="Ej: Corte 3">
+                    </div>
+                    <div class="form-group">
+                        <label>Estado</label>
+                        <select id="add-status" required>
+                            <option value="Backlog">Backlog</option>
+                            <option value="Asignado a">Asignado a</option>
+                            <option value="En progreso">En progreso</option>
+                            <option value="En revisión">En revisión</option>
+                            <option value="Finalizado">Finalizado</option>
+                        </select>
+                    </div>
+                    <div class="form-group full-width">
+                        <label>Actividad</label>
+                        <input type="text" id="add-act" placeholder="Título o descripción de la tarea..." required>
+                    </div>
+                    <div class="form-group">
+                        <label>Módulo</label>
+                        <input type="text" id="add-mod" placeholder="Ej: Frontend">
+                    </div>
+                    <div class="form-group">
+                        <label>Rol responsable</label>
+                        <input type="text" id="add-rol" placeholder="Ej: Scrum Master">
+                    </div>
+                    <div class="form-group">
+                        <label>Prioridad</label>
+                        <select id="add-prio">
+                            <option value="Obligatorio">Obligatorio</option>
+                            <option value="Deseable">Deseable</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Tamaño</label>
+                        <select id="add-tam">
+                            <option value="S">S</option>
+                            <option value="M">M</option>
+                            <option value="L">L</option>
+                        </select>
+                    </div>
+                    <div class="form-group full-width">
+                        <label>Criterio de aceptación</label>
+                        <textarea id="add-crit" rows="2" placeholder="¿Qué debe cumplir para considerarse hecho?" required></textarea>
+                    </div>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn-cancel" onclick="closeAddModal()">Cancelar</button>
+                    <button type="submit" class="btn-save">Crear Tarjeta</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal para EDITAR tarjeta existente (Links y Estado manual) -->
     <div class="modal-overlay" id="editModal">
         <div class="modal">
             <h2 id="modal-title">Editar Actividad</h2>
             <p id="modal-desc" style="font-size: 13px; color: #6b7280; margin-bottom: 15px;"></p>
             
-            <div class="form-group">
+            <div class="form-group" style="margin-bottom: 15px;">
                 <label>Estado actual (También puedes arrastrarla):</label>
                 <select id="modal-status">
                     <option value="Backlog">Backlog</option>
@@ -203,7 +248,7 @@
             </div>
 
             <div class="modal-actions">
-                <button class="btn-cancel" onclick="closeModal()">Cancelar</button>
+                <button class="btn-cancel" onclick="closeEditModal()">Cancelar</button>
                 <button class="btn-save" onclick="saveCard()">Guardar Cambios</button>
             </div>
         </div>
@@ -212,78 +257,12 @@
 <script>
     let currentEditingId = null;
 
-    // Base de datos local (Las 59 tareas)
+    // Base de datos local (Tareas de ejemplo extraidas del Backlog)
     const tasks = [
-        // Sprint 0
-        { id: "S0-01", status: "Backlog", act: "Formar el equipo y asignar roles Scrum", crit: "Acta en /docs/equipo.md con integrantes, roles y medio de contacto.", rol: "Scrum Master", link: "" },
-        { id: "S0-02", status: "Backlog", act: "Crear cuentas: GitHub, Google, Pasarela y IA", crit: "Cada integrante confirma que entra a las cuatro herramientas.", rol: "Todos", link: "" },
-        { id: "S0-03", status: "Backlog", act: "Crear el repositorio público con README e invitar al equipo", crit: "Repositorio lms-nombredemarca creado; todos en Collaborators.", rol: "Scrum Master", link: "" },
-        { id: "S0-04", status: "Backlog", act: "Crear la estructura de carpetas y archivos base", crit: "Existen /css, /js, /img, /backend, /docs y los 7 archivos HTML vacíos.", rol: "Frontend", link: "" },
-        { id: "S0-05", status: "Backlog", act: "Hacer el inventario de cursos prediseñados", crit: "/docs/cursos.md con nombre, promesa, precio y módulos.", rol: "Product Owner", link: "" },
-        { id: "S0-06", status: "Backlog", act: "Elegir la ruta tecnológica y escribir CONTEXTO.md", crit: "CONTEXTO.md con ruta, marca, estructura de carpetas.", rol: "Datos", link: "" },
-        { id: "S0-07", status: "Backlog", act: "Crear el tablero en GitHub Projects y cargar Issues", crit: "Tablero con 5 columnas; Issues del sprint 1 creados.", rol: "Scrum Master", link: "" },
-        { id: "S0-08", status: "Backlog", act: "Planear el sprint 1", crit: "Cada Issue del sprint 1 tiene responsable y tamaño.", rol: "Product Owner", link: "" },
-
-        // Sprint 1
-        { id: "S1-01", status: "Backlog", act: "Dibujar el mapa del sitio (13 pantallas)", crit: "Diagrama en /docs que muestra cómo se enlazan las pantallas.", rol: "Diseño", link: "" },
-        { id: "S1-02", status: "Backlog", act: "Wireframes de las 5 pantallas clave", crit: "Inicio, catálogo, detalle, mis cursos y lección en Figma.", rol: "Diseño", link: "" },
-        { id: "S1-03", status: "Backlog", act: "Definir la guía de estilo de la marca", crit: "Logo, colores hex, tipografías; variables en css/estilos.css.", rol: "Diseño", link: "" },
-        { id: "S1-04", status: "Backlog", act: "Construir la landing page con IA", crit: "Header, hero, beneficios, cursos; responsive.", rol: "Frontend", link: "" },
-        { id: "S1-05", status: "Backlog", act: "Construir catálogo de cursos con tarjetas", crit: "Muestra cursos de js/datos.js y filtro funciona.", rol: "Frontend", link: "" },
-        { id: "S1-06", status: "Backlog", act: "Construir página de detalle del curso", crit: "Abre temario, instructor y botón Comprar.", rol: "Frontend", link: "" },
-        { id: "S1-07", status: "Backlog", act: "Diseñar formulario de información CRM", crit: "Valida nombre y correo.", rol: "Frontend", link: "" },
-        { id: "S1-08", status: "Backlog", act: "Publicar el sitio en GitHub Pages", crit: "El enlace público abre desde un celular.", rol: "Datos", link: "" },
-        { id: "S1-09", status: "Backlog", act: "Registrar bitácora de IA del sprint", crit: "3 prompts clave con herramienta, resultado y correcciones.", rol: "Todos", link: "" },
-        { id: "S1-10", status: "Backlog", act: "Retrospectiva del sprint 1", crit: "Demo en clase y acta de retro en /docs.", rol: "Scrum Master", link: "" },
-
-        // Sprint 2
-        { id: "S2-01", status: "Backlog", act: "Crear proyecto en Firebase y registrar web", crit: "js/firebase-config.js conectado.", rol: "Datos", link: "" },
-        { id: "S2-02", status: "Backlog", act: "Activar Auth y autorizar dominio", crit: "El dominio de GitHub Pages aparece autorizado.", rol: "Datos", link: "" },
-        { id: "S2-03", status: "Backlog", act: "Construir registro e inicio de sesión", crit: "Registrarse crea documento en users.", rol: "Frontend", link: "" },
-        { id: "S2-04", status: "Backlog", act: "Header dinámico según sesión", crit: "Con sesión muestra el nombre y Salir.", rol: "Frontend", link: "" },
-        { id: "S2-05", status: "Backlog", act: "Reglas de seguridad Firestore", crit: "Un visitante no puede escribir en courses.", rol: "Datos", link: "" },
-        { id: "S2-06", status: "Backlog", act: "Cargar cursos a Firestore", crit: "Al menos 2 cursos completos.", rol: "Product Owner", link: "" },
-        { id: "S2-07", status: "Backlog", act: "Conectar catálogo a Firestore", crit: "Cambiar precio en consola se refleja en web.", rol: "Frontend", link: "" },
-        { id: "S2-08", status: "Backlog", act: "Guardar contactos en leads CRM", crit: "Cada envío crea un lead con etapa nuevo.", rol: "Frontend", link: "" },
-        { id: "S2-09", status: "Backlog", act: "Proteger admin.html", crit: "Un estudiante es redirigido al inicio.", rol: "Datos", link: "" },
-        { id: "S2-10", status: "Backlog", act: "Retrospectiva del sprint 2", crit: "Demo en vivo y acta.", rol: "Todos", link: "" },
-
-        // Sprint 3
-        { id: "S3-01", status: "Backlog", act: "Subir videos y materiales", crit: "Cada lección tiene su enlace.", rol: "Product Owner", link: "" },
-        { id: "S3-02", status: "Backlog", act: "Panel admin: crear cursos", crit: "Curso creado aparece en catálogo.", rol: "Frontend", link: "" },
-        { id: "S3-03", status: "Backlog", act: "Panel admin: ordenar lecciones", crit: "Lecciones en orden definido.", rol: "Frontend", link: "" },
-        { id: "S3-04", status: "Backlog", act: "Construir pantalla de lección", crit: "Video, texto, material descargable.", rol: "Frontend", link: "" },
-        { id: "S3-05", status: "Backlog", act: "Marcar lección como completada", crit: "Se guarda el progreso.", rol: "Frontend", link: "" },
-        { id: "S3-06", status: "Backlog", act: "Barra de progreso de Mis cursos", crit: "Porcentaje exacto de avance.", rol: "Frontend", link: "" },
-        { id: "S3-07", status: "Backlog", act: "Inscripción manual desde panel", crit: "Admin inscribe usuario para pruebas.", rol: "Datos", link: "" },
-        { id: "S3-08", status: "Backlog", act: "Bloquear lecciones a no inscritos", crit: "Usuario sin permiso no ve contenido.", rol: "Datos", link: "" },
-        { id: "S3-09", status: "Backlog", act: "Perfil con historial de compras", crit: "Muestra cursos comprados.", rol: "Frontend", link: "" },
-        { id: "S3-10", status: "Backlog", act: "Retrospectiva del sprint 3", crit: "Demo en vivo y acta.", rol: "Todos", link: "" },
-
-        // Sprint 4
-        { id: "S4-01", status: "Backlog", act: "Credenciales de pasarela de pago", crit: "Usuarios vendedor y comprador creados.", rol: "Datos", link: "" },
-        { id: "S4-02", status: "Backlog", act: "Apps Script: crearPago", crit: "Devuelve enlace de pago.", rol: "Datos", link: "" },
-        { id: "S4-03", status: "Backlog", act: "Botón Comprar y API", crit: "Abre pantalla de pago.", rol: "Frontend", link: "" },
-        { id: "S4-04", status: "Backlog", act: "Página de regreso post-pago", crit: "Muestra éxito o rechazo.", rol: "Frontend", link: "" },
-        { id: "S4-05", status: "Backlog", act: "Notificación de pago Webhook", crit: "Pasarela avisa a Apps Script.", rol: "Datos", link: "" },
-        { id: "S4-06", status: "Backlog", act: "Paywall automático", crit: "Inscribe al estudiante al pagar.", rol: "Datos", link: "" },
-        { id: "S4-07", status: "Backlog", act: "Mover lead CRM a Cliente", crit: "Pasa a cliente tras pagar.", rol: "Datos", link: "" },
-        { id: "S4-08", status: "Backlog", act: "Panel CRM: Embudo Kanban", crit: "Tarjetas por etapas.", rol: "Frontend", link: "" },
-        { id: "S4-09", status: "Backlog", act: "Panel CRM: Historial notas", crit: "Abre historial de cliente.", rol: "Frontend", link: "" },
-        { id: "S4-10", status: "Backlog", act: "Probar flujo de compra", crit: "Comprador de prueba paga y entra.", rol: "Product Owner", link: "" },
-        { id: "S4-11", status: "Backlog", act: "Retrospectiva sprint 4", crit: "Demo y acta.", rol: "Todos", link: "" },
-
-        // Sprint 5
-        { id: "S5-01", status: "Backlog", act: "Panel admin: Instructores", crit: "Gestión de profesores.", rol: "Frontend", link: "" },
-        { id: "S5-02", status: "Backlog", act: "Panel admin: Costos de curso", crit: "Registrar materiales y honorarios.", rol: "Frontend", link: "" },
-        { id: "S5-03", status: "Backlog", act: "Panel admin: Reporte finanzas", crit: "Total vendido y margen.", rol: "Frontend", link: "" },
-        { id: "S5-04", status: "Backlog", act: "Políticas de privacidad", crit: "Páginas publicadas.", rol: "Product Owner", link: "" },
-        { id: "S5-05", status: "Backlog", act: "Pruebas de usabilidad", crit: "3 usuarios reales lo prueban.", rol: "Diseño", link: "" },
-        { id: "S5-06", status: "Backlog", act: "Bug fixing", crit: "Carga rápido y sin errores.", rol: "Todos", link: "" },
-        { id: "S5-07", status: "Backlog", act: "Video demo de plataforma", crit: "Video YouTube 3 min.", rol: "Todos", link: "" },
-        { id: "S5-08", status: "Backlog", act: "Documentación final", crit: "README con instalación.", rol: "Scrum Master", link: "" },
-        { id: "S5-09", status: "Backlog", act: "Presentación Demo Day", crit: "Pitch y demo en vivo.", rol: "Todos", link: "" },
-        { id: "S5-10", status: "Backlog", act: "Retrospectiva y cierre", crit: "Acta final de proyecto.", rol: "Scrum Master", link: "" }
+        { id: "S0-01", sprint: "Sprint 0", corte: "Corte 1", status: "Backlog", act: "Formar el equipo y asignar roles Scrum", mod: "Gestión ágil", rol: "Scrum Master", prio: "Obligatorio", tam: "S", crit: "Acta en /docs/equipo.md con integrantes, roles y medio de contacto.", link: "" },
+        { id: "S1-04", sprint: "Sprint 1", corte: "Corte 1", status: "En progreso", act: "Construir la landing page con IA", mod: "Mercadeo", rol: "Frontend", prio: "Obligatorio", tam: "L", crit: "Header, hero, beneficios, cursos; responsive.", link: "" },
+        { id: "S2-03", sprint: "Sprint 2", corte: "Corte 2", status: "En revisión", act: "Construir registro e inicio de sesión", mod: "Usuarios", rol: "Frontend", prio: "Obligatorio", tam: "M", crit: "Registrarse crea documento en users.", link: "https://github.com" },
+        { id: "S4-01", sprint: "Sprint 4", corte: "Corte 3", status: "Backlog", act: "Credenciales de pasarela de pago", mod: "Datos", rol: "Datos y backend", prio: "Obligatorio", tam: "S", crit: "Usuarios vendedor y comprador creados.", link: "" },
     ];
 
     function renderBoard() {
@@ -302,22 +281,18 @@
                 const hasLink = task.link && task.link.trim() !== "";
                 const card = document.createElement('div');
                 card.className = 'kanban-card';
-                card.draggable = true; // Activar drag & drop nativo
+                card.draggable = true; 
                 card.id = `card-${task.id}`;
                 
-                // Eventos para Drag and Drop
                 card.addEventListener('dragstart', handleDragStart);
                 card.addEventListener('dragend', handleDragEnd);
                 
-                // Evento para abrir modal (evitar abrir si estamos dando click al enlace)
                 card.onclick = (e) => {
-                    if(e.target.tagName !== 'A') {
-                        openModal(task.id);
-                    }
+                    if(e.target.tagName !== 'A') { openEditModal(task.id); }
                 };
                 
                 card.innerHTML = `
-                    <h4 class="card-title">${task.act}</h4>
+                    <h4 class="card-title"><span style="color:#6366f1">${task.id}</span> - ${task.act}</h4>
                     <p class="card-desc">${task.crit}</p>
                     <div class="card-meta">
                         <span class="card-role">${task.rol}</span>
@@ -331,56 +306,72 @@
     }
 
     // --- Lógica de Drag and Drop ---
-    
     let draggedCardId = null;
 
     function handleDragStart(e) {
         draggedCardId = this.id.replace('card-', '');
         this.classList.add('dragging');
         e.dataTransfer.effectAllowed = 'move';
-        // Necesario para Firefox
         e.dataTransfer.setData('text/plain', draggedCardId);
     }
 
     function handleDragEnd(e) {
         this.classList.remove('dragging');
-        // Limpiar estilos de las columnas
         document.querySelectorAll('.kanban-column').forEach(col => col.classList.remove('drag-over'));
     }
 
-    // Configurar columnas para recibir tarjetas
     const dropzones = document.querySelectorAll('.kanban-column.dropzone');
-    
     dropzones.forEach(zone => {
         zone.addEventListener('dragover', (e) => {
-            e.preventDefault(); // Necesario para permitir el "drop"
+            e.preventDefault(); 
             e.dataTransfer.dropEffect = 'move';
             zone.classList.add('drag-over');
         });
-
-        zone.addEventListener('dragleave', () => {
-            zone.classList.remove('drag-over');
-        });
-
+        zone.addEventListener('dragleave', () => { zone.classList.remove('drag-over'); });
         zone.addEventListener('drop', (e) => {
             e.preventDefault();
             zone.classList.remove('drag-over');
-            
             const newStatus = zone.getAttribute('data-status');
-            
-            // Actualizar la tarea en la base de datos
             const task = tasks.find(t => t.id === draggedCardId);
             if(task && task.status !== newStatus) {
                 task.status = newStatus;
-                renderBoard(); // Volver a pintar la pantalla
+                renderBoard();
             }
         });
     });
 
+    // --- Lógica del Modal CREAR NUEVA TARJETA ---
+    function openAddModal() {
+        document.getElementById('addCardForm').reset();
+        document.getElementById('addModal').style.display = 'flex';
+    }
 
-    // --- Lógica del Modal ---
+    function closeAddModal() {
+        document.getElementById('addModal').style.display = 'none';
+    }
 
-    function openModal(id) {
+    function addNewCard() {
+        const newTask = {
+            id: document.getElementById('add-id').value,
+            sprint: document.getElementById('add-sprint').value,
+            corte: document.getElementById('add-corte').value,
+            status: document.getElementById('add-status').value,
+            act: document.getElementById('add-act').value,
+            mod: document.getElementById('add-mod').value,
+            rol: document.getElementById('add-rol').value,
+            prio: document.getElementById('add-prio').value,
+            tam: document.getElementById('add-tam').value,
+            crit: document.getElementById('add-crit').value,
+            link: "" // Inicialmente sin enlace
+        };
+
+        tasks.push(newTask);
+        closeAddModal();
+        renderBoard();
+    }
+
+    // --- Lógica del Modal EDITAR (Enlaces) ---
+    function openEditModal(id) {
         currentEditingId = id;
         const task = tasks.find(t => t.id === id);
         
@@ -392,26 +383,23 @@
         document.getElementById('editModal').style.display = 'flex';
     }
 
-    function closeModal() {
+    function closeEditModal() {
         document.getElementById('editModal').style.display = 'none';
         currentEditingId = null;
     }
 
     function saveCard() {
         if (!currentEditingId) return;
-
         const task = tasks.find(t => t.id === currentEditingId);
         task.status = document.getElementById('modal-status').value;
         task.link = document.getElementById('modal-link').value;
-
-        closeModal();
-        renderBoard(); // Si el estado cambió, se moverá a su nueva columna
+        closeEditModal();
+        renderBoard(); 
     }
 
-    // Cerrar modal al hacer click en fondo oscuro
-    document.getElementById('editModal').addEventListener('click', function(e) {
-        if (e.target === this) closeModal();
-    });
+    // Cerrar modales al hacer clic fuera del cuadro blanco
+    document.getElementById('addModal').addEventListener('click', function(e) { if (e.target === this) closeAddModal(); });
+    document.getElementById('editModal').addEventListener('click', function(e) { if (e.target === this) closeEditModal(); });
 
     // Carga inicial
     renderBoard();
