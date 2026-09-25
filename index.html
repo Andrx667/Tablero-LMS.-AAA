@@ -46,9 +46,8 @@
             font-size: 14px;
             font-weight: 600;
             cursor: pointer;
-            transition: background-color 0.2s;
+            transition: background 0.2s;
         }
-        
         .btn-primary:hover { background-color: var(--primary-hover); }
 
         .kanban-board {
@@ -90,7 +89,6 @@
             cursor: grab;
             transition: transform 0.1s;
         }
-
         .kanban-card:active { cursor: grabbing; }
         .kanban-card:hover { transform: translateY(-2px); box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
         .kanban-card.dragging { opacity: 0.5; }
@@ -103,21 +101,20 @@
         .card-link-icon { color: #059669; font-weight: bold; display: none; }
         .link-display { margin-top: 10px; font-size: 12px; background: #f0fdf4; padding: 6px; border-radius: 4px; word-break: break-all; display: none; }
 
-        /* Estilos de los Modales */
+        /* Modals Styles */
         .modal-overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); align-items: center; justify-content: center; z-index: 1000; }
-        .modal { background: white; padding: 25px; border-radius: 10px; width: 100%; max-width: 450px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); max-height: 90vh; overflow-y: auto; }
-        .modal.large { max-width: 600px; }
+        .modal { background: white; padding: 25px; border-radius: 10px; width: 100%; max-width: 500px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); max-height: 90vh; overflow-y: auto; }
         .modal h2 { margin: 0 0 15px 0; font-size: 18px; }
         
-        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-        .form-group { margin-bottom: 0; }
+        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 15px; }
         .form-group.full-width { grid-column: span 2; }
-        .form-group label { display: block; margin-bottom: 5px; font-size: 13px; font-weight: 600;}
+        .form-group label { display: block; margin-bottom: 5px; font-size: 12px; font-weight: 600; color: #374151;}
         .form-group select, .form-group input, .form-group textarea { width: 100%; padding: 8px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 13px; box-sizing: border-box; }
+        .form-group textarea { resize: vertical; min-height: 60px; }
         
         .modal-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px;}
-        .btn-cancel { background: #f3f4f6; color: #374151; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; }
-        .btn-save { background: var(--primary); color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; }
+        .btn-cancel { background: #f3f4f6; color: #374151; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-weight: 600; }
+        .btn-save { background: var(--primary); color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-weight: 600; }
     </style>
 </head>
 <body>
@@ -127,7 +124,7 @@
             <h1>Tablero Kanban - Equipo LMS</h1>
             <p>Desarrollo del curso de IA para creación web (Arrastra las tarjetas para moverlas)</p>
         </div>
-        <button class="btn-primary" onclick="openAddModal()">+ Nueva Tarjeta</button>
+        <button class="btn-primary" onclick="openNewCardModal()">+ Nueva Tarjeta</button>
     </div>
 
     <div class="kanban-board">
@@ -135,121 +132,91 @@
             <div class="column-header">Backlog</div>
             <div class="cards-container"></div>
         </div>
-        
         <div class="kanban-column dropzone" data-status="Asignado a" id="col-asignado">
             <div class="column-header">Asignado a</div>
             <div class="cards-container"></div>
         </div>
-
         <div class="kanban-column dropzone" data-status="En progreso" id="col-progreso">
             <div class="column-header">En progreso</div>
             <div class="cards-container"></div>
         </div>
-
         <div class="kanban-column review dropzone" data-status="En revisión" id="col-revision">
             <div class="column-header">En revisión 🧪</div>
             <div class="cards-container"></div>
         </div>
-
         <div class="kanban-column done dropzone" data-status="Finalizado" id="col-finalizado">
             <div class="column-header">Finalizado</div>
             <div class="cards-container"></div>
         </div>
     </div>
 
-    <!-- Modal para Agregar NUEVA Actividad (Basado en la tabla) -->
-    <div class="modal-overlay" id="addModal">
-        <div class="modal large">
-            <h2>Agregar Nueva Actividad</h2>
-            <form id="addCardForm" onsubmit="event.preventDefault(); addNewCard();">
-                <div class="form-grid">
-                    <div class="form-group">
-                        <label>ID</label>
-                        <input type="text" id="add-id" placeholder="Ej: S6-01" required>
-                    </div>
-                    <div class="form-group">
-                        <label>Sprint</label>
-                        <input type="text" id="add-sprint" placeholder="Ej: Sprint 6" required>
-                    </div>
-                    <div class="form-group">
-                        <label>Corte</label>
-                        <input type="text" id="add-corte" placeholder="Ej: Corte 3">
-                    </div>
-                    <div class="form-group">
-                        <label>Estado</label>
-                        <select id="add-status" required>
-                            <option value="Backlog">Backlog</option>
-                            <option value="Asignado a">Asignado a</option>
-                            <option value="En progreso">En progreso</option>
-                            <option value="En revisión">En revisión</option>
-                            <option value="Finalizado">Finalizado</option>
-                        </select>
-                    </div>
-                    <div class="form-group full-width">
-                        <label>Actividad</label>
-                        <input type="text" id="add-act" placeholder="Título o descripción de la tarea..." required>
-                    </div>
-                    <div class="form-group">
-                        <label>Módulo</label>
-                        <input type="text" id="add-mod" placeholder="Ej: Frontend">
-                    </div>
-                    <div class="form-group">
-                        <label>Rol responsable</label>
-                        <input type="text" id="add-rol" placeholder="Ej: Scrum Master">
-                    </div>
-                    <div class="form-group">
-                        <label>Prioridad</label>
-                        <select id="add-prio">
-                            <option value="Obligatorio">Obligatorio</option>
-                            <option value="Deseable">Deseable</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label>Tamaño</label>
-                        <select id="add-tam">
-                            <option value="S">S</option>
-                            <option value="M">M</option>
-                            <option value="L">L</option>
-                        </select>
-                    </div>
-                    <div class="form-group full-width">
-                        <label>Criterio de aceptación</label>
-                        <textarea id="add-crit" rows="2" placeholder="¿Qué debe cumplir para considerarse hecho?" required></textarea>
-                    </div>
+    <!-- MODAL: Crear Nueva Tarjeta (Con todos los campos de la imagen) -->
+    <div class="modal-overlay" id="newCardModal">
+        <div class="modal">
+            <h2>Crear Nueva Actividad</h2>
+            <div class="form-grid">
+                <div class="form-group"><label>ID</label><input type="text" id="n-id" placeholder="Ej: S6-01"></div>
+                <div class="form-group"><label>Sprint</label><input type="text" id="n-sprint" placeholder="Ej: Sprint 6"></div>
+                
+                <div class="form-group"><label>Corte</label>
+                    <select id="n-corte">
+                        <option value="Corte 1">Corte 1</option><option value="Corte 2">Corte 2</option><option value="Corte 3">Corte 3</option>
+                    </select>
                 </div>
-                <div class="modal-actions">
-                    <button type="button" class="btn-cancel" onclick="closeAddModal()">Cancelar</button>
-                    <button type="submit" class="btn-save">Crear Tarjeta</button>
+                <div class="form-group"><label>Estado</label>
+                    <select id="n-estado">
+                        <option value="Backlog">Backlog</option><option value="Asignado a">Asignado a</option>
+                        <option value="En progreso">En progreso</option><option value="En revisión">En revisión</option>
+                        <option value="Finalizado">Finalizado</option>
+                    </select>
                 </div>
-            </form>
+
+                <div class="form-group full-width"><label>Actividad</label><input type="text" id="n-act" placeholder="Nombre de la tarea"></div>
+                
+                <div class="form-group"><label>Módulo</label><input type="text" id="n-mod" placeholder="Ej: Backend"></div>
+                <div class="form-group"><label>Rol responsable</label><input type="text" id="n-rol" placeholder="Ej: Frontend"></div>
+                
+                <div class="form-group"><label>Prioridad</label>
+                    <select id="n-prio">
+                        <option value="Obligatorio">Obligatorio</option><option value="Deseable">Deseable</option>
+                    </select>
+                </div>
+                <div class="form-group"><label>Tamaño</label>
+                    <select id="n-tam">
+                        <option value="S">S</option><option value="M">M</option><option value="L">L</option>
+                    </select>
+                </div>
+
+                <div class="form-group full-width"><label>Criterio de aceptación</label><textarea id="n-crit" placeholder="Condición para considerar la tarea lista"></textarea></div>
+            </div>
+            <div class="modal-actions">
+                <button class="btn-cancel" onclick="closeNewCardModal()">Cancelar</button>
+                <button class="btn-save" onclick="saveNewCard()">Crear Tarjeta</button>
+            </div>
         </div>
     </div>
 
-    <!-- Modal para EDITAR tarjeta existente (Links y Estado manual) -->
+    <!-- MODAL: Editar Tarjeta (Para cambiar estado o agregar enlace entregable) -->
     <div class="modal-overlay" id="editModal">
         <div class="modal">
             <h2 id="modal-title">Editar Actividad</h2>
             <p id="modal-desc" style="font-size: 13px; color: #6b7280; margin-bottom: 15px;"></p>
             
-            <div class="form-group" style="margin-bottom: 15px;">
+            <div class="form-group">
                 <label>Estado actual (También puedes arrastrarla):</label>
                 <select id="modal-status">
-                    <option value="Backlog">Backlog</option>
-                    <option value="Asignado a">Asignado a</option>
-                    <option value="En progreso">En progreso</option>
-                    <option value="En revisión">En revisión</option>
+                    <option value="Backlog">Backlog</option><option value="Asignado a">Asignado a</option>
+                    <option value="En progreso">En progreso</option><option value="En revisión">En revisión</option>
                     <option value="Finalizado">Finalizado</option>
                 </select>
             </div>
-
             <div class="form-group">
                 <label>Enlace Entregable (GitHub, Figma, Google Docs):</label>
                 <input type="url" id="modal-link" placeholder="https://...">
             </div>
-
             <div class="modal-actions">
                 <button class="btn-cancel" onclick="closeEditModal()">Cancelar</button>
-                <button class="btn-save" onclick="saveCard()">Guardar Cambios</button>
+                <button class="btn-save" onclick="saveEditedCard()">Guardar Cambios</button>
             </div>
         </div>
     </div>
@@ -257,12 +224,78 @@
 <script>
     let currentEditingId = null;
 
-    // Base de datos local (Tareas de ejemplo extraidas del Backlog)
+    // Base de datos local (Las 59 tareas con todos sus campos)
     const tasks = [
-        { id: "S0-01", sprint: "Sprint 0", corte: "Corte 1", status: "Backlog", act: "Formar el equipo y asignar roles Scrum", mod: "Gestión ágil", rol: "Scrum Master", prio: "Obligatorio", tam: "S", crit: "Acta en /docs/equipo.md con integrantes, roles y medio de contacto.", link: "" },
-        { id: "S1-04", sprint: "Sprint 1", corte: "Corte 1", status: "En progreso", act: "Construir la landing page con IA", mod: "Mercadeo", rol: "Frontend", prio: "Obligatorio", tam: "L", crit: "Header, hero, beneficios, cursos; responsive.", link: "" },
-        { id: "S2-03", sprint: "Sprint 2", corte: "Corte 2", status: "En revisión", act: "Construir registro e inicio de sesión", mod: "Usuarios", rol: "Frontend", prio: "Obligatorio", tam: "M", crit: "Registrarse crea documento en users.", link: "https://github.com" },
-        { id: "S4-01", sprint: "Sprint 4", corte: "Corte 3", status: "Backlog", act: "Credenciales de pasarela de pago", mod: "Datos", rol: "Datos y backend", prio: "Obligatorio", tam: "S", crit: "Usuarios vendedor y comprador creados.", link: "" },
+        // Sprint 0
+        { id: "S0-01", sprint: "Sprint 0", corte: "Corte 1", act: "Formar el equipo y asignar roles Scrum", mod: "Gestión ágil", rol: "Scrum Master", prio: "Obligatorio", tam: "S", crit: "Acta en /docs/equipo.md con integrantes, roles y medio de contacto.", status: "Backlog", link: "" },
+        { id: "S0-02", sprint: "Sprint 0", corte: "Corte 1", act: "Crear cuentas: GitHub, Google, Pasarela y IA", mod: "Configuración", rol: "Todos", prio: "Obligatorio", tam: "S", crit: "Cada integrante confirma que entra a las cuatro herramientas.", status: "Backlog", link: "" },
+        { id: "S0-03", sprint: "Sprint 0", corte: "Corte 1", act: "Crear el repositorio público con README e invitar al equipo", mod: "GitHub", rol: "Scrum Master", prio: "Obligatorio", tam: "S", crit: "Repositorio lms-nombredemarca creado; todos en Collaborators.", status: "Backlog", link: "" },
+        { id: "S0-04", sprint: "Sprint 0", corte: "Corte 1", act: "Crear la estructura de carpetas y archivos base", mod: "GitHub", rol: "Frontend", prio: "Obligatorio", tam: "S", crit: "Existen /css, /js, /img, /backend, /docs y los 7 archivos HTML vacíos.", status: "Backlog", link: "" },
+        { id: "S0-05", sprint: "Sprint 0", corte: "Corte 1", act: "Hacer el inventario de cursos prediseñados", mod: "Contenido", rol: "Product Owner", prio: "Obligatorio", tam: "M", crit: "/docs/cursos.md con nombre, promesa, precio y módulos.", status: "Backlog", link: "" },
+        { id: "S0-06", sprint: "Sprint 0", corte: "Corte 1", act: "Elegir la ruta tecnológica y escribir CONTEXTO.md", mod: "Arquitectura", rol: "Datos y backend", prio: "Obligatorio", tam: "S", crit: "CONTEXTO.md con ruta, marca, estructura de carpetas.", status: "Backlog", link: "" },
+        { id: "S0-07", sprint: "Sprint 0", corte: "Corte 1", act: "Crear el tablero en GitHub Projects y cargar Issues", mod: "Gestión ágil", rol: "Scrum Master", prio: "Obligatorio", tam: "M", crit: "Tablero con 5 columnas; Issues del sprint 1 creados.", status: "Backlog", link: "" },
+        { id: "S0-08", sprint: "Sprint 0", corte: "Corte 1", act: "Planear el sprint 1", mod: "Gestión ágil", rol: "Product Owner", prio: "Obligatorio", tam: "S", crit: "Cada Issue del sprint 1 tiene responsable y tamaño.", status: "Backlog", link: "" },
+
+        // Sprint 1
+        { id: "S1-01", sprint: "Sprint 1", corte: "Corte 1", act: "Dibujar el mapa del sitio (13 pantallas)", mod: "UX", rol: "Diseño", prio: "Obligatorio", tam: "S", crit: "Diagrama en /docs que muestra cómo se enlazan las pantallas.", status: "Backlog", link: "" },
+        { id: "S1-02", sprint: "Sprint 1", corte: "Corte 1", act: "Wireframes de las 5 pantallas clave", mod: "UX", rol: "Diseño", prio: "Obligatorio", tam: "M", crit: "Inicio, catálogo, detalle, mis cursos y lección en Figma.", status: "Backlog", link: "" },
+        { id: "S1-03", sprint: "Sprint 1", corte: "Corte 1", act: "Definir la guía de estilo de la marca", mod: "Marca", rol: "Diseño", prio: "Obligatorio", tam: "M", crit: "Logo, colores hex, tipografías; variables en css/estilos.css.", status: "Backlog", link: "" },
+        { id: "S1-04", sprint: "Sprint 1", corte: "Corte 1", act: "Construir la landing page con IA", mod: "Mercadeo", rol: "Frontend", prio: "Obligatorio", tam: "L", crit: "Header, hero, beneficios, cursos; responsive.", status: "Backlog", link: "" },
+        { id: "S1-05", sprint: "Sprint 1", corte: "Corte 1", act: "Construir catálogo de cursos con tarjetas", mod: "LMS", rol: "Frontend", prio: "Obligatorio", tam: "M", crit: "Muestra cursos de js/datos.js y filtro funciona.", status: "Backlog", link: "" },
+        { id: "S1-06", sprint: "Sprint 1", corte: "Corte 1", act: "Construir página de detalle del curso", mod: "LMS", rol: "Frontend", prio: "Obligatorio", tam: "M", crit: "Abre temario, instructor y botón Comprar.", status: "Backlog", link: "" },
+        { id: "S1-07", sprint: "Sprint 1", corte: "Corte 1", act: "Diseñar formulario de información CRM", mod: "CRM", rol: "Frontend", prio: "Obligatorio", tam: "S", crit: "Valida nombre y correo.", status: "Backlog", link: "" },
+        { id: "S1-08", sprint: "Sprint 1", corte: "Corte 1", act: "Publicar el sitio en GitHub Pages", mod: "Publicación", rol: "Datos y backend", prio: "Obligatorio", tam: "S", crit: "El enlace público abre desde un celular.", status: "Backlog", link: "" },
+        { id: "S1-09", sprint: "Sprint 1", corte: "Corte 1", act: "Registrar bitácora de IA del sprint", mod: "Documentación", rol: "Todos", prio: "Obligatorio", tam: "S", crit: "3 prompts clave con herramienta, resultado y correcciones.", status: "Backlog", link: "" },
+        { id: "S1-10", sprint: "Sprint 1", corte: "Corte 1", act: "Retrospectiva del sprint 1", mod: "Gestión ágil", rol: "Scrum Master", prio: "Obligatorio", tam: "S", crit: "Demo en clase y acta de retro en /docs.", status: "Backlog", link: "" },
+
+        // Sprint 2
+        { id: "S2-01", sprint: "Sprint 2", corte: "Corte 2", act: "Crear proyecto en Firebase y registrar web", mod: "Configuración", rol: "Datos y backend", prio: "Obligatorio", tam: "S", crit: "js/firebase-config.js conectado.", status: "Backlog", link: "" },
+        { id: "S2-02", sprint: "Sprint 2", corte: "Corte 2", act: "Activar Auth y autorizar dominio", mod: "Usuarios", rol: "Datos y backend", prio: "Obligatorio", tam: "S", crit: "El dominio de GitHub Pages aparece autorizado.", status: "Backlog", link: "" },
+        { id: "S2-03", sprint: "Sprint 2", corte: "Corte 2", act: "Construir registro e inicio de sesión", mod: "Usuarios", rol: "Frontend", prio: "Obligatorio", tam: "M", crit: "Registrarse crea documento en users.", status: "Backlog", link: "" },
+        { id: "S2-04", sprint: "Sprint 2", corte: "Corte 2", act: "Header dinámico según sesión", mod: "Usuarios", rol: "Frontend", prio: "Deseable", tam: "S", crit: "Con sesión muestra el nombre y Salir.", status: "Backlog", link: "" },
+        { id: "S2-05", sprint: "Sprint 2", corte: "Corte 2", act: "Reglas de seguridad Firestore", mod: "Datos", rol: "Datos y backend", prio: "Obligatorio", tam: "M", crit: "Un visitante no puede escribir en courses.", status: "Backlog", link: "" },
+        { id: "S2-06", sprint: "Sprint 2", corte: "Corte 2", act: "Cargar cursos a Firestore", mod: "LMS", rol: "Product Owner", prio: "Obligatorio", tam: "M", crit: "Al menos 2 cursos completos.", status: "Backlog", link: "" },
+        { id: "S2-07", sprint: "Sprint 2", corte: "Corte 2", act: "Conectar catálogo a Firestore", mod: "LMS", rol: "Frontend", prio: "Obligatorio", tam: "M", crit: "Cambiar precio en consola se refleja en web.", status: "Backlog", link: "" },
+        { id: "S2-08", sprint: "Sprint 2", corte: "Corte 2", act: "Guardar contactos en leads CRM", mod: "CRM", rol: "Frontend", prio: "Obligatorio", tam: "M", crit: "Cada envío crea un lead con etapa nuevo.", status: "Backlog", link: "" },
+        { id: "S2-09", sprint: "Sprint 2", corte: "Corte 2", act: "Proteger admin.html", mod: "Usuarios", rol: "Datos y backend", prio: "Obligatorio", tam: "S", crit: "Un estudiante es redirigido al inicio.", status: "Backlog", link: "" },
+        { id: "S2-10", sprint: "Sprint 2", corte: "Corte 2", act: "Retrospectiva del sprint 2", mod: "Gestión ágil", rol: "Todos", prio: "Obligatorio", tam: "S", crit: "Demo en vivo y acta.", status: "Backlog", link: "" },
+
+        // Sprint 3
+        { id: "S3-01", sprint: "Sprint 3", corte: "Corte 2", act: "Subir videos y materiales", mod: "Contenido", rol: "Product Owner", prio: "Obligatorio", tam: "M", crit: "Cada lección tiene su enlace.", status: "Backlog", link: "" },
+        { id: "S3-02", sprint: "Sprint 3", corte: "Corte 2", act: "Panel admin: crear cursos", mod: "LMS", rol: "Frontend", prio: "Obligatorio", tam: "L", crit: "Curso creado aparece en catálogo.", status: "Backlog", link: "" },
+        { id: "S3-03", sprint: "Sprint 3", corte: "Corte 2", act: "Panel admin: ordenar lecciones", mod: "LMS", rol: "Frontend", prio: "Obligatorio", tam: "L", crit: "Lecciones en orden definido.", status: "Backlog", link: "" },
+        { id: "S3-04", sprint: "Sprint 3", corte: "Corte 2", act: "Construir pantalla de lección", mod: "LMS", rol: "Frontend", prio: "Obligatorio", tam: "L", crit: "Video, texto, material descargable.", status: "Backlog", link: "" },
+        { id: "S3-05", sprint: "Sprint 3", corte: "Corte 2", act: "Marcar lección como completada", mod: "LMS", rol: "Frontend", prio: "Obligatorio", tam: "M", crit: "Se guarda el progreso.", status: "Backlog", link: "" },
+        { id: "S3-06", sprint: "Sprint 3", corte: "Corte 2", act: "Barra de progreso de Mis cursos", mod: "LMS", rol: "Frontend", prio: "Obligatorio", tam: "M", crit: "Porcentaje exacto de avance.", status: "Backlog", link: "" },
+        { id: "S3-07", sprint: "Sprint 3", corte: "Corte 2", act: "Inscripción manual desde panel", mod: "LMS", rol: "Datos y backend", prio: "Obligatorio", tam: "S", crit: "Admin inscribe usuario para pruebas.", status: "Backlog", link: "" },
+        { id: "S3-08", sprint: "Sprint 3", corte: "Corte 2", act: "Bloquear lecciones a no inscritos", mod: "Seguridad", rol: "Datos y backend", prio: "Obligatorio", tam: "M", crit: "Usuario sin permiso no ve contenido.", status: "Backlog", link: "" },
+        { id: "S3-09", sprint: "Sprint 3", corte: "Corte 2", act: "Perfil con historial de compras", mod: "Usuarios", rol: "Frontend", prio: "Deseable", tam: "S", crit: "Muestra cursos comprados.", status: "Backlog", link: "" },
+        { id: "S3-10", sprint: "Sprint 3", corte: "Corte 2", act: "Retrospectiva del sprint 3", mod: "Gestión ágil", rol: "Todos", prio: "Obligatorio", tam: "S", crit: "Demo en vivo y acta.", status: "Backlog", link: "" },
+
+        // Sprint 4
+        { id: "S4-01", sprint: "Sprint 4", corte: "Corte 3", act: "Credenciales de pasarela de pago", mod: "Pagos", rol: "Datos y backend", prio: "Obligatorio", tam: "S", crit: "Usuarios vendedor y comprador creados.", status: "Backlog", link: "" },
+        { id: "S4-02", sprint: "Sprint 4", corte: "Corte 3", act: "Apps Script: crearPago", mod: "Pagos", rol: "Datos y backend", prio: "Obligatorio", tam: "M", crit: "Devuelve enlace de pago.", status: "Backlog", link: "" },
+        { id: "S4-03", sprint: "Sprint 4", corte: "Corte 3", act: "Botón Comprar y API", mod: "Pagos", rol: "Frontend", prio: "Obligatorio", tam: "M", crit: "Abre pantalla de pago.", status: "Backlog", link: "" },
+        { id: "S4-04", sprint: "Sprint 4", corte: "Corte 3", act: "Página de regreso post-pago", mod: "Pagos", rol: "Frontend", prio: "Obligatorio", tam: "S", crit: "Muestra éxito o rechazo.", status: "Backlog", link: "" },
+        { id: "S4-05", sprint: "Sprint 4", corte: "Corte 3", act: "Notificación de pago Webhook", mod: "Pagos", rol: "Datos y backend", prio: "Obligatorio", tam: "L", crit: "Pasarela avisa a Apps Script.", status: "Backlog", link: "" },
+        { id: "S4-06", sprint: "Sprint 4", corte: "Corte 3", act: "Paywall automático", mod: "LMS", rol: "Datos y backend", prio: "Obligatorio", tam: "M", crit: "Inscribe al estudiante al pagar.", status: "Backlog", link: "" },
+        { id: "S4-07", sprint: "Sprint 4", corte: "Corte 3", act: "Mover lead CRM a Cliente", mod: "CRM", rol: "Datos y backend", prio: "Obligatorio", tam: "M", crit: "Pasa a cliente tras pagar.", status: "Backlog", link: "" },
+        { id: "S4-08", sprint: "Sprint 4", corte: "Corte 3", act: "Panel CRM: Embudo Kanban", mod: "CRM", rol: "Frontend", prio: "Obligatorio", tam: "L", crit: "Tarjetas por etapas.", status: "Backlog", link: "" },
+        { id: "S4-09", sprint: "Sprint 4", corte: "Corte 3", act: "Panel CRM: Historial notas", mod: "CRM", rol: "Frontend", prio: "Deseable", tam: "M", crit: "Abre historial de cliente.", status: "Backlog", link: "" },
+        { id: "S4-10", sprint: "Sprint 4", corte: "Corte 3", act: "Probar flujo de compra", mod: "Pruebas", rol: "Product Owner", prio: "Obligatorio", tam: "M", crit: "Comprador de prueba paga y entra.", status: "Backlog", link: "" },
+        { id: "S4-11", sprint: "Sprint 4", corte: "Corte 3", act: "Retrospectiva sprint 4", mod: "Gestión ágil", rol: "Todos", prio: "Obligatorio", tam: "S", crit: "Demo y acta.", status: "Backlog", link: "" },
+
+        // Sprint 5
+        { id: "S5-01", sprint: "Sprint 5", corte: "Corte 3", act: "Panel admin: Instructores", mod: "Recursos", rol: "Frontend", prio: "Obligatorio", tam: "M", crit: "Gestión de profesores.", status: "Backlog", link: "" },
+        { id: "S5-02", sprint: "Sprint 5", corte: "Corte 3", act: "Panel admin: Costos de curso", mod: "Recursos", rol: "Frontend", prio: "Obligatorio", tam: "M", crit: "Registrar materiales y honorarios.", status: "Backlog", link: "" },
+        { id: "S5-03", sprint: "Sprint 5", corte: "Corte 3", act: "Panel admin: Reporte finanzas", mod: "Reportes", rol: "Frontend", prio: "Obligatorio", tam: "M", crit: "Total vendido y margen.", status: "Backlog", link: "" },
+        { id: "S5-04", sprint: "Sprint 5", corte: "Corte 3", act: "Políticas de privacidad", mod: "Legales", rol: "Product Owner", prio: "Obligatorio", tam: "S", crit: "Páginas publicadas.", status: "Backlog", link: "" },
+        { id: "S5-05", sprint: "Sprint 5", corte: "Corte 3", act: "Pruebas de usabilidad", mod: "Pruebas", rol: "Diseño", prio: "Obligatorio", tam: "M", crit: "3 usuarios reales lo prueban.", status: "Backlog", link: "" },
+        { id: "S5-06", sprint: "Sprint 5", corte: "Corte 3", act: "Bug fixing", mod: "Calidad", rol: "Todos", prio: "Obligatorio", tam: "M", crit: "Carga rápido y sin errores.", status: "Backlog", link: "" },
+        { id: "S5-07", sprint: "Sprint 5", corte: "Corte 3", act: "Video demo de plataforma", mod: "Mercadeo", rol: "Todos", prio: "Obligatorio", tam: "M", crit: "Video YouTube 3 min.", status: "Backlog", link: "" },
+        { id: "S5-08", sprint: "Sprint 5", corte: "Corte 3", act: "Documentación final", mod: "Documentación", rol: "Scrum Master", prio: "Obligatorio", tam: "M", crit: "README con instalación.", status: "Backlog", link: "" },
+        { id: "S5-09", sprint: "Sprint 5", corte: "Corte 3", act: "Presentación Demo Day", mod: "Gestión ágil", rol: "Todos", prio: "Obligatorio", tam: "M", crit: "Pitch y demo en vivo.", status: "Backlog", link: "" },
+        { id: "S5-10", sprint: "Sprint 5", corte: "Corte 3", act: "Retrospectiva y cierre", mod: "Gestión ágil", rol: "Scrum Master", prio: "Deseable", tam: "S", crit: "Acta final de proyecto.", status: "Backlog", link: "" }
     ];
 
     function renderBoard() {
@@ -281,21 +314,21 @@
                 const hasLink = task.link && task.link.trim() !== "";
                 const card = document.createElement('div');
                 card.className = 'kanban-card';
-                card.draggable = true; 
+                card.draggable = true;
                 card.id = `card-${task.id}`;
                 
                 card.addEventListener('dragstart', handleDragStart);
                 card.addEventListener('dragend', handleDragEnd);
                 
                 card.onclick = (e) => {
-                    if(e.target.tagName !== 'A') { openEditModal(task.id); }
+                    if(e.target.tagName !== 'A') openEditModal(task.id);
                 };
                 
                 card.innerHTML = `
-                    <h4 class="card-title"><span style="color:#6366f1">${task.id}</span> - ${task.act}</h4>
+                    <h4 class="card-title">${task.act}</h4>
                     <p class="card-desc">${task.crit}</p>
                     <div class="card-meta">
-                        <span class="card-role">${task.rol}</span>
+                        <span class="card-role">${task.rol || 'Sin Asignar'}</span>
                         <span class="card-link-icon" style="display: ${hasLink ? 'inline' : 'none'}">📎 Entregable</span>
                     </div>
                     ${hasLink ? `<div class="link-display" style="display:block;"><a href="${task.link}" target="_blank">Abrir enlace</a></div>` : ''}
@@ -323,11 +356,11 @@
     const dropzones = document.querySelectorAll('.kanban-column.dropzone');
     dropzones.forEach(zone => {
         zone.addEventListener('dragover', (e) => {
-            e.preventDefault(); 
+            e.preventDefault();
             e.dataTransfer.dropEffect = 'move';
             zone.classList.add('drag-over');
         });
-        zone.addEventListener('dragleave', () => { zone.classList.remove('drag-over'); });
+        zone.addEventListener('dragleave', () => zone.classList.remove('drag-over'));
         zone.addEventListener('drop', (e) => {
             e.preventDefault();
             zone.classList.remove('drag-over');
@@ -335,42 +368,52 @@
             const task = tasks.find(t => t.id === draggedCardId);
             if(task && task.status !== newStatus) {
                 task.status = newStatus;
-                renderBoard();
+                renderBoard(); 
             }
         });
     });
 
-    // --- Lógica del Modal CREAR NUEVA TARJETA ---
-    function openAddModal() {
-        document.getElementById('addCardForm').reset();
-        document.getElementById('addModal').style.display = 'flex';
+    // --- Lógica del Modal Nueva Tarjeta ---
+    function openNewCardModal() {
+        document.getElementById('n-id').value = `NEW-${Math.floor(Math.random()*1000)}`;
+        document.getElementById('n-sprint').value = '';
+        document.getElementById('n-corte').value = 'Corte 1';
+        document.getElementById('n-estado').value = 'Backlog';
+        document.getElementById('n-act').value = '';
+        document.getElementById('n-mod').value = '';
+        document.getElementById('n-rol').value = '';
+        document.getElementById('n-prio').value = 'Obligatorio';
+        document.getElementById('n-tam').value = 'M';
+        document.getElementById('n-crit').value = '';
+        
+        document.getElementById('newCardModal').style.display = 'flex';
     }
 
-    function closeAddModal() {
-        document.getElementById('addModal').style.display = 'none';
+    function closeNewCardModal() {
+        document.getElementById('newCardModal').style.display = 'none';
     }
 
-    function addNewCard() {
+    function saveNewCard() {
         const newTask = {
-            id: document.getElementById('add-id').value,
-            sprint: document.getElementById('add-sprint').value,
-            corte: document.getElementById('add-corte').value,
-            status: document.getElementById('add-status').value,
-            act: document.getElementById('add-act').value,
-            mod: document.getElementById('add-mod').value,
-            rol: document.getElementById('add-rol').value,
-            prio: document.getElementById('add-prio').value,
-            tam: document.getElementById('add-tam').value,
-            crit: document.getElementById('add-crit').value,
-            link: "" // Inicialmente sin enlace
+            id: document.getElementById('n-id').value || `NEW-${Math.floor(Math.random()*1000)}`,
+            sprint: document.getElementById('n-sprint').value,
+            corte: document.getElementById('n-corte').value,
+            status: document.getElementById('n-estado').value,
+            act: document.getElementById('n-act').value || 'Sin Título',
+            mod: document.getElementById('n-mod').value,
+            rol: document.getElementById('n-rol').value || 'Sin Asignar',
+            prio: document.getElementById('n-prio').value,
+            tam: document.getElementById('n-tam').value,
+            crit: document.getElementById('n-crit').value,
+            link: ""
         };
 
         tasks.push(newTask);
-        closeAddModal();
+        closeNewCardModal();
         renderBoard();
     }
 
-    // --- Lógica del Modal EDITAR (Enlaces) ---
+    // --- Lógica del Modal Editar Tarjeta ---
     function openEditModal(id) {
         currentEditingId = id;
         const task = tasks.find(t => t.id === id);
@@ -388,22 +431,28 @@
         currentEditingId = null;
     }
 
-    function saveCard() {
+    function saveEditedCard() {
         if (!currentEditingId) return;
         const task = tasks.find(t => t.id === currentEditingId);
         task.status = document.getElementById('modal-status').value;
         task.link = document.getElementById('modal-link').value;
+        
         closeEditModal();
-        renderBoard(); 
+        renderBoard();
     }
 
-    // Cerrar modales al hacer clic fuera del cuadro blanco
-    document.getElementById('addModal').addEventListener('click', function(e) { if (e.target === this) closeAddModal(); });
-    document.getElementById('editModal').addEventListener('click', function(e) { if (e.target === this) closeEditModal(); });
+    // Cerrar modales al hacer click fuera
+    document.querySelectorAll('.modal-overlay').forEach(modal => {
+        modal.addEventListener('click', function(e) {
+            if (e.target === this) {
+                this.style.display = 'none';
+                currentEditingId = null;
+            }
+        });
+    });
 
     // Carga inicial
     renderBoard();
 </script>
-
 </body>
 </html>
