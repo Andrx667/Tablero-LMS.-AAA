@@ -3,425 +3,408 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tablero LMS - Backlog Completo de Actividades</title>
+    <title>Tablero Kanban - Equipo LMS</title>
     <style>
         :root {
-            --bg-color: #f8f9fa;
-            --card-bg: #ffffff;
-            --primary-color: #1a73e8;
-            --text-color: #202124;
-            --subtext-color: #5f6368;
-            --border-color: #e0e0e0;
-            --header-bg: #1e293b;
+            --bg-body: #ffffff;
+            --bg-col-default: #f3f4f6;
+            --bg-col-review: #fef08a;
+            --bg-col-done: #dcfce7;
+            --primary: #6366f1;
+            --primary-hover: #4f46e5;
+            --text-dark: #1f2937;
+            --text-muted: #6b7280;
+            --border-card: #e5e7eb;
+            --card-border-left: #818cf8;
+            --card-border-left-done: #34d399;
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            background-color: var(--bg-color);
-            color: var(--text-color);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: var(--bg-body);
+            color: var(--text-dark);
             margin: 0;
             padding: 20px;
         }
 
-        .container {
-            max-width: 1400px;
-            margin: 0 auto;
-        }
-
-        header {
-            background-color: var(--header-bg);
-            color: white;
-            padding: 20px 25px;
-            border-radius: 12px;
-            margin-bottom: 25px;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-        }
-
-        header h1 {
-            margin: 0 0 5px 0;
-            font-size: 22px;
-        }
-
-        header p {
-            margin: 0;
-            font-size: 13px;
-            color: #94a3b8;
-        }
-
-        /* Dashboard Metrics */
-        .metrics-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 15px;
-            margin-bottom: 25px;
-        }
-
-        .metric-card {
-            background: var(--card-bg);
-            padding: 18px;
-            border-radius: 10px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-            border: 1px solid var(--border-color);
-            border-left: 5px solid var(--primary-color);
-        }
-
-        .metric-card h3 {
-            margin: 0 0 8px 0;
-            font-size: 12px;
-            color: var(--subtext-color);
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        .metric-card .value {
-            font-size: 26px;
-            font-weight: 700;
-        }
-
-        /* Controls / Filters */
-        .filter-container {
-            background: var(--card-bg);
-            padding: 15px 20px;
-            border-radius: 10px;
-            border: 1px solid var(--border-color);
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
             margin-bottom: 20px;
+        }
+
+        .header h1 {
+            margin: 0;
+            font-size: 24px;
+        }
+
+        .header p {
+            margin: 4px 0 0 0;
+            font-size: 14px;
+            color: var(--text-muted);
+        }
+
+        .btn-primary {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .kanban-board {
             display: flex;
             gap: 15px;
-            flex-wrap: wrap;
-            align-items: center;
+            overflow-x: auto;
+            padding-bottom: 20px;
+            min-height: calc(100vh - 120px);
         }
 
-        .filter-group {
+        .kanban-column {
+            background-color: var(--bg-col-default);
+            border-radius: 8px;
+            min-width: 280px;
+            width: 280px;
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .kanban-column.review { background-color: var(--bg-col-review); }
+        .kanban-column.done { background-color: var(--bg-col-done); }
+
+        .column-header {
+            font-size: 14px;
+            font-weight: 700;
+            margin-bottom: 10px;
+            color: var(--text-dark);
+        }
+
+        .kanban-card {
+            background: white;
+            border-radius: 6px;
+            padding: 12px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            border: 1px solid var(--border-card);
+            border-left: 4px solid var(--card-border-left);
+            cursor: pointer;
+            transition: transform 0.1s;
+        }
+
+        .kanban-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .kanban-column.done .kanban-card {
+            border-left-color: var(--card-border-left-done);
+        }
+
+        .card-title {
+            font-size: 13px;
+            font-weight: 700;
+            margin: 0 0 6px 0;
+            line-height: 1.3;
+        }
+
+        .card-desc {
+            font-size: 12px;
+            color: var(--text-muted);
+            margin: 0 0 10px 0;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .card-meta {
             display: flex;
             align-items: center;
-            gap: 8px;
-            font-size: 13px;
-            font-weight: 600;
-        }
-
-        select {
-            padding: 6px 12px;
-            border-radius: 6px;
-            border: 1px solid #cbd5e1;
-            background-color: #fff;
-            font-size: 13px;
-        }
-
-        /* Table */
-        .table-container {
-            background: var(--card-bg);
-            border-radius: 10px;
-            border: 1px solid var(--border-color);
-            overflow-x: auto;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            text-align: left;
-            font-size: 13px;
-        }
-
-        th, td {
-            padding: 10px 14px;
-            border-bottom: 1px solid var(--border-color);
-            vertical-align: top;
-        }
-
-        th {
-            background-color: #f1f5f9;
-            color: #475569;
-            font-weight: 600;
-            text-transform: uppercase;
+            justify-content: space-between;
             font-size: 11px;
-            letter-spacing: 0.5px;
-            white-space: nowrap;
         }
 
-        tr:hover {
-            background-color: #f8fafc;
-        }
-
-        .badge {
-            display: inline-block;
-            padding: 3px 8px;
-            border-radius: 12px;
-            font-size: 11px;
-            font-weight: 600;
-            white-space: nowrap;
-        }
-
-        .badge-corte1 { background: #dbeafe; color: #1e40af; }
-        .badge-corte2 { background: #dcfce7; color: #166534; }
-        .badge-corte3 { background: #ffedd5; color: #9a3412; }
-
-        .badge-ob { background: #fef2f2; color: #991b1b; }
-        .badge-des { background: #f0fdf4; color: #166534; }
-
-        select.status-select {
-            padding: 4px 8px;
-            border-radius: 6px;
-            font-size: 12px;
+        .card-role {
+            background: #e0e7ff;
+            color: #3730a3;
+            padding: 2px 6px;
+            border-radius: 4px;
             font-weight: 600;
         }
-
-        .status-por-hacer { background-color: #f1f5f9; color: #475569; }
-        .status-en-progreso { background-color: #fef9c3; color: #854d0e; }
-        .status-en-revision { background-color: #e0e7ff; color: #3730a3; }
-        .status-hecho { background-color: #dcfce7; color: #166534; }
-
-        .acceptance {
-            color: #64748b;
-            font-size: 12px;
-            max-width: 280px;
-        }
-
-        .id-cell {
+        
+        .card-link-icon {
+            color: #059669;
             font-weight: bold;
-            font-family: monospace;
+            display: none;
+        }
+
+        /* Modal Styles */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.5);
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .modal {
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            width: 100%;
+            max-width: 450px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+        }
+
+        .modal h2 { margin: 0 0 15px 0; font-size: 18px; }
+        
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; margin-bottom: 5px; font-size: 13px; font-weight: 600;}
+        .form-group select, .form-group input {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            font-size: 14px;
+            box-sizing: border-box;
+        }
+
+        .modal-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px;}
+        .btn-cancel { background: #f3f4f6; color: #374151; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; }
+        .btn-save { background: var(--primary); color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; }
+        
+        .link-display {
+            margin-top: 10px;
+            font-size: 12px;
+            background: #f0fdf4;
+            padding: 6px;
+            border-radius: 4px;
+            word-break: break-all;
+            display: none;
         }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <header>
-        <h1>Backlog del Proyecto: Plataforma de Cursos (LMS + CRM) con IA</h1>
-        <p>E-Business · Listado completo de 59 actividades</p>
-    </header>
+    <div class="header">
+        <div>
+            <h1>Tablero Kanban - Equipo LMS</h1>
+            <p>Desarrollo del curso de IA para creación web</p>
+        </div>
+        <button class="btn-primary">+ Nueva Tarjeta</button>
+    </div>
 
-    <!-- Metricas -->
-    <div class="metrics-grid">
-        <div class="metric-card">
-            <h3>Total Actividades</h3>
-            <div class="value" id="m-total">59</div>
+    <div class="kanban-board">
+        <!-- Columnas -->
+        <div class="kanban-column" id="col-backlog">
+            <div class="column-header">Backlog</div>
+            <div class="cards-container"></div>
         </div>
-        <div class="metric-card" style="border-left-color: #166534;">
-            <h3>Hechas</h3>
-            <div class="value" id="m-hechas">0</div>
+        
+        <div class="kanban-column" id="col-asignado">
+            <div class="column-header">Asignado a</div>
+            <div class="cards-container"></div>
         </div>
-        <div class="metric-card" style="border-left-color: #854d0e;">
-            <h3>En Progreso</h3>
-            <div class="value" id="m-progreso">0</div>
+
+        <div class="kanban-column" id="col-progreso">
+            <div class="column-header">En progreso</div>
+            <div class="cards-container"></div>
         </div>
-        <div class="metric-card" style="border-left-color: #991b1b;">
-            <h3>Por Hacer</h3>
-            <div class="value" id="m-pendiente">59</div>
+
+        <div class="kanban-column review" id="col-revision">
+            <div class="column-header">En revisión 🧪</div>
+            <div class="cards-container"></div>
         </div>
-        <div class="metric-card" style="border-left-color: #0284c7;">
-            <h3>% Avance Global</h3>
-            <div class="value" id="m-avance">0%</div>
+
+        <div class="kanban-column done" id="col-finalizado">
+            <div class="column-header">Finalizado</div>
+            <div class="cards-container"></div>
         </div>
     </div>
 
-    <!-- Filtros -->
-    <div class="filter-container">
-        <div class="filter-group">
-            <label for="filter-sprint">Sprint:</label>
-            <select id="filter-sprint" onchange="filterData()">
-                <option value="ALL">Todos los Sprints</option>
-                <option value="Sprint 0">Sprint 0 · Preparar el terreno</option>
-                <option value="Sprint 1">Sprint 1 · Diseñar y maquetar</option>
-                <option value="Sprint 2">Sprint 2 · Usuarios y datos</option>
-                <option value="Sprint 3">Sprint 3 · Aula virtual</option>
-                <option value="Sprint 4">Sprint 4 · Pagos y CRM</option>
-                <option value="Sprint 5">Sprint 5 · Recursos y lanzamiento</option>
-            </select>
-        </div>
-        <div class="filter-group">
-            <label for="filter-corte">Corte:</label>
-            <select id="filter-corte" onchange="filterData()">
-                <option value="ALL">Todos los Cortes</option>
-                <option value="Corte 1">Corte 1</option>
-                <option value="Corte 2">Corte 2</option>
-                <option value="Corte 3">Corte 3</option>
-            </select>
-        </div>
-        <div class="filter-group">
-            <label for="filter-estado">Estado:</label>
-            <select id="filter-estado" onchange="filterData()">
-                <option value="ALL">Todos los Estados</option>
-                <option value="Por hacer">Por hacer</option>
-                <option value="En progreso">En progreso</option>
-                <option value="En revisión">En revisión</option>
-                <option value="Hecho">Hecho</option>
-            </select>
-        </div>
-    </div>
+    <!-- Modal para editar la tarjeta -->
+    <div class="modal-overlay" id="editModal">
+        <div class="modal">
+            <h2 id="modal-title">Editar Actividad</h2>
+            <p id="modal-desc" style="font-size: 13px; color: #6b7280; margin-bottom: 15px;"></p>
+            
+            <div class="form-group">
+                <label>Mover a columna:</label>
+                <select id="modal-status">
+                    <option value="Backlog">Backlog</option>
+                    <option value="Asignado a">Asignado a</option>
+                    <option value="En progreso">En progreso</option>
+                    <option value="En revisión">En revisión</option>
+                    <option value="Finalizado">Finalizado</option>
+                </select>
+            </div>
 
-    <!-- Tabla -->
-    <div class="table-container">
-        <table id="tasks-table">
-            <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>Sprint</th>
-                    <th>Corte</th>
-                    <th>Actividad</th>
-                    <th>Módulo</th>
-                    <th>Rol</th>
-                    <th>Prio.</th>
-                    <th>Tam.</th>
-                    <th>Criterio de Aceptación</th>
-                    <th>Estado</th>
-                </tr>
-            </thead>
-            <tbody id="table-body">
-                <!-- Se llena dinámicamente -->
-            </tbody>
-        </table>
+            <div class="form-group">
+                <label>Enlace Entregable (GitHub, Figma, Google Docs):</label>
+                <input type="url" id="modal-link" placeholder="https://...">
+            </div>
+
+            <div class="modal-actions">
+                <button class="btn-cancel" onclick="closeModal()">Cancelar</button>
+                <button class="btn-save" onclick="saveCard()">Guardar Cambios</button>
+            </div>
+        </div>
     </div>
-</div>
 
 <script>
-const tasks = [
-    // Sprint 0
-    { id: "S0-01", sprint: "Sprint 0 · Preparar el terreno", corte: "Corte 1", act: "Formar el equipo y asignar roles Scrum", mod: "Gestión ágil", rol: "Scrum Master", prio: "Obligatorio", tam: "S", crit: "Acta en /docs/equipo.md con integrantes, roles y medio de contacto.", est: "Por hacer" },
-    { id: "S0-02", sprint: "Sprint 0 · Preparar el terreno", corte: "Corte 1", act: "Crear cuentas: GitHub (Student Pack), Google/Firebase, cuenta de desarrollador de la pasarela y IA", mod: "Configuración", rol: "Todos", prio: "Obligatorio", tam: "S", crit: "Cada integrante confirma que entra a las cuatro herramientas.", est: "Por hacer" },
-    { id: "S0-03", sprint: "Sprint 0 · Preparar el terreno", corte: "Corte 1", act: "Crear el repositorio público con README e invitar al equipo y al profesor", mod: "GitHub", rol: "Scrum Master", prio: "Obligatorio", tam: "S", crit: "Repositorio lms-nombredemarca creado; todos aparecen en Collaborators.", est: "Por hacer" },
-    { id: "S0-04", sprint: "Sprint 0 · Preparar el terreno", corte: "Corte 1", act: "Crear la estructura de carpetas y los archivos base", mod: "GitHub", rol: "Frontend", prio: "Obligatorio", tam: "S", crit: "Existen /css, /js, /img, /backend, /docs y los 7 archivos HTML vacíos.", est: "Por hacer" },
-    { id: "S0-05", sprint: "Sprint 0 · Preparar el terreno", corte: "Corte 1", act: "Hacer el inventario de cursos prediseñados", mod: "Contenido", rol: "Product Owner", prio: "Obligatorio", tam: "M", crit: "/docs/cursos.md con nombre, promesa, público, precio, módulos, lecciones e instructor.", est: "Por hacer" },
-    { id: "S0-06", sprint: "Sprint 0 · Preparar el terreno", corte: "Corte 1", act: "Elegir la ruta tecnológica y escribir CONTEXTO.md", mod: "Arquitectura", rol: "Datos y backend", prio: "Obligatorio", tam: "S", crit: "CONTEXTO.md con ruta, marca, estructura de carpetas y reglas para la IA.", est: "Por hacer" },
-    { id: "S0-07", sprint: "Sprint 0 · Preparar el terreno", corte: "Corte 1", act: "Crear el tablero en GitHub Projects y cargar el backlog como Issues", mod: "Gestión ágil", rol: "Scrum Master", prio: "Obligatorio", tam: "M", crit: "Tablero con 5 columnas; Issues del sprint 1 creados con Milestone.", est: "Por hacer" },
-    { id: "S0-08", sprint: "Sprint 0 · Preparar el terreno", corte: "Corte 1", act: "Planear el sprint 1", mod: "Gestión ágil", rol: "Product Owner", prio: "Obligatorio", tam: "S", crit: "Cada Issue del sprint 1 tiene responsable y tamaño.", est: "Por hacer" },
+    // Variables globales
+    let currentEditingId = null;
 
-    // Sprint 1
-    { id: "S1-01", sprint: "Sprint 1 · Diseñar y maquetar", corte: "Corte 1", act: "Dibujar el mapa del sitio con las 13 pantallas", mod: "Experiencia (UX)", rol: "Diseño", prio: "Obligatorio", tam: "S", crit: "Diagrama en /docs que muestra cómo se enlazan las pantallas.", est: "Por hacer" },
-    { id: "S1-02", sprint: "Sprint 1 · Diseñar y maquetar", corte: "Corte 1", act: "Hacer los wireframes de las 5 pantallas clave", mod: "Experiencia (UX)", rol: "Diseño", prio: "Obligatorio", tam: "M", crit: "Inicio, catálogo, detalle, mis cursos y lección en Figma o foto en /docs.", est: "Por hacer" },
-    { id: "S1-03", sprint: "Sprint 1 · Diseñar y maquetar", corte: "Corte 1", act: "Definir la guía de estilo de la marca", mod: "Marca", rol: "Diseño", prio: "Obligatorio", tam: "M", crit: "Logo, colores hex, 2 tipografías, botones y tarjetas; variables en css/estilos.css.", est: "Por hacer" },
-    { id: "S1-04", sprint: "Sprint 1 · Diseñar y maquetar", corte: "Corte 1", act: "Construir la landing page con IA", mod: "Mercadeo", rol: "Frontend", prio: "Obligatorio", tam: "L", crit: "Header, hero, beneficios, cursos destacados, FAQ y footer; responsive.", est: "Por hacer" },
-    { id: "S1-05", sprint: "Sprint 1 · Diseñar y maquetar", corte: "Corte 1", act: "Construir el catálogo de cursos con tarjetas y filtro", mod: "LMS", rol: "Frontend", prio: "Obligatorio", tam: "M", crit: "Muestra todos los cursos de js/datos.js y el filtro por categoría funciona.", est: "Por hacer" },
-    { id: "S1-06", sprint: "Sprint 1 · Diseñar y maquetar", corte: "Corte 1", act: "Construir la página de detalle del curso", mod: "LMS", rol: "Frontend", prio: "Obligatorio", tam: "M", crit: "Abre temario, instructor, precio y botón Comprar.", est: "Por hacer" },
-    { id: "S1-07", sprint: "Sprint 1 · Diseñar y maquetar", corte: "Corte 1", act: "Diseñar el formulario 'Quiero más información'", mod: "CRM", rol: "Frontend", prio: "Obligatorio", tam: "S", crit: "Valida nombre y correo e incluye casilla de datos.", est: "Por hacer" },
-    { id: "S1-08", sprint: "Sprint 1 · Diseñar y maquetar", corte: "Corte 1", act: "Publicar el sitio en GitHub Pages", mod: "Publicación", rol: "Datos y backend", prio: "Obligatorio", tam: "S", crit: "El enlace público abre desde un celular.", est: "Por hacer" },
-    { id: "S1-09", sprint: "Sprint 1 · Diseñar y maquetar", corte: "Corte 1", act: "Registrar la bitácora de IA del sprint", mod: "Documentación", rol: "Todos", prio: "Obligatorio", tam: "S", crit: "Al menos 3 prompts clave con herramienta, resultado y correcciones.", est: "Por hacer" },
-    { id: "S1-10", sprint: "Sprint 1 · Diseñar y maquetar", corte: "Corte 1", act: "Revisión y retrospectiva del sprint 1", mod: "Gestión ágil", rol: "Scrum Master", prio: "Obligatorio", tam: "S", crit: "Demo en clase y acta de retro en /docs.", est: "Por hacer" },
+    // Las 59 tareas extraídas del backlog
+    const tasks = [
+        // Sprint 0
+        { id: "S0-01", status: "Backlog", act: "Formar el equipo y asignar roles Scrum", crit: "Acta en /docs/equipo.md con integrantes, roles y medio de contacto.", rol: "Scrum Master", link: "" },
+        { id: "S0-02", status: "Backlog", act: "Crear cuentas: GitHub, Google, Pasarela y IA", crit: "Cada integrante confirma que entra a las cuatro herramientas.", rol: "Todos", link: "" },
+        { id: "S0-03", status: "Backlog", act: "Crear el repositorio público con README e invitar al equipo", crit: "Repositorio lms-nombredemarca creado; todos en Collaborators.", rol: "Scrum Master", link: "" },
+        { id: "S0-04", status: "Backlog", act: "Crear la estructura de carpetas y archivos base", crit: "Existen /css, /js, /img, /backend, /docs y los 7 archivos HTML vacíos.", rol: "Frontend", link: "" },
+        { id: "S0-05", status: "Backlog", act: "Hacer el inventario de cursos prediseñados", crit: "/docs/cursos.md con nombre, promesa, precio y módulos.", rol: "Product Owner", link: "" },
+        { id: "S0-06", status: "Backlog", act: "Elegir la ruta tecnológica y escribir CONTEXTO.md", crit: "CONTEXTO.md con ruta, marca, estructura de carpetas.", rol: "Datos", link: "" },
+        { id: "S0-07", status: "Backlog", act: "Crear el tablero en GitHub Projects y cargar Issues", crit: "Tablero con 5 columnas; Issues del sprint 1 creados.", rol: "Scrum Master", link: "" },
+        { id: "S0-08", status: "Backlog", act: "Planear el sprint 1", crit: "Cada Issue del sprint 1 tiene responsable y tamaño.", rol: "Product Owner", link: "" },
 
-    // Sprint 2
-    { id: "S2-01", sprint: "Sprint 2 · Usuarios y datos", corte: "Corte 2", act: "Crear el proyecto en Firebase y registrar la app web", mod: "Configuración", rol: "Datos y backend", prio: "Obligatorio", tam: "S", crit: "js/firebase-config.js conectado sin errores en la consola.", est: "Por hacer" },
-    { id: "S2-02", sprint: "Sprint 2 · Usuarios y datos", corte: "Corte 2", act: "Activar Authentication (correo y Google) y autorizar el dominio", mod: "Usuarios", rol: "Datos y backend", prio: "Obligatorio", tam: "S", crit: "El dominio de GitHub Pages aparece en Dominios autorizados.", est: "Por hacer" },
-    { id: "S2-03", sprint: "Sprint 2 · Usuarios y datos", corte: "Corte 2", act: "Construir registro e inicio de sesión", mod: "Usuarios", rol: "Frontend", prio: "Obligatorio", tam: "M", crit: "Registrarse crea documento en users con rol student; cerrar sesión funciona.", est: "Por hacer" },
-    { id: "S2-04", sprint: "Sprint 2 · Usuarios y datos", corte: "Corte 2", act: "Header que cambia según la sesión (Entrar / Mis cursos / Salir)", mod: "Usuarios", rol: "Frontend", prio: "Deseable", tam: "S", crit: "Con sesión iniciada el header muestra el nombre y botón Salir.", est: "Por hacer" },
-    { id: "S2-05", sprint: "Sprint 2 · Usuarios y datos", corte: "Corte 2", act: "Crear Firestore y publicar las reglas de seguridad iniciales", mod: "Datos", rol: "Datos y backend", prio: "Obligatorio", tam: "M", crit: "Un visitante no puede escribir en courses ni leer users de otros.", est: "Por hacer" },
-    { id: "S2-06", sprint: "Sprint 2 · Usuarios y datos", corte: "Corte 2", act: "Cargar los cursos y lecciones del inventario a Firestore", mod: "LMS", rol: "Product Owner", prio: "Obligatorio", tam: "M", crit: "Al menos 2 cursos completos en courses y lessons.", est: "Por hacer" },
-    { id: "S2-07", sprint: "Sprint 2 · Usuarios y datos", corte: "Corte 2", act: "Conectar catálogo y detalle a Firestore", mod: "LMS", rol: "Frontend", prio: "Obligatorio", tam: "M", crit: "Cambiar un precio en la consola se refleja en la página.", est: "Por hacer" },
-    { id: "S2-08", sprint: "Sprint 2 · Usuarios y datos", corte: "Corte 2", act: "Guardar los contactos del formulario en leads", mod: "CRM", rol: "Frontend", prio: "Obligatorio", tam: "M", crit: "Cada envío crea un lead con etapa nuevo, origen, fecha y consentimiento.", est: "Por hacer" },
-    { id: "S2-09", sprint: "Sprint 2 · Usuarios y datos", corte: "Corte 2", act: "Crear el rol administrador y proteger admin.html", mod: "Usuarios", rol: "Datos y backend", prio: "Obligatorio", tam: "S", crit: "Un estudiante que abre admin.html es redirigido al inicio.", est: "Por hacer" },
-    { id: "S2-10", sprint: "Sprint 2 · Usuarios y datos", corte: "Corte 2", act: "Bitácora de IA, revisión y retrospectiva del sprint 2", mod: "Gestión ágil", rol: "Todos", prio: "Obligatorio", tam: "S", crit: "Demo en vivo desde el enlace publicado y acta de retro.", est: "Por hacer" },
+        // Sprint 1
+        { id: "S1-01", status: "Backlog", act: "Dibujar el mapa del sitio (13 pantallas)", crit: "Diagrama en /docs que muestra cómo se enlazan las pantallas.", rol: "Diseño", link: "" },
+        { id: "S1-02", status: "Backlog", act: "Wireframes de las 5 pantallas clave", crit: "Inicio, catálogo, detalle, mis cursos y lección en Figma.", rol: "Diseño", link: "" },
+        { id: "S1-03", status: "Backlog", act: "Definir la guía de estilo de la marca", crit: "Logo, colores hex, tipografías; variables en css/estilos.css.", rol: "Diseño", link: "" },
+        { id: "S1-04", status: "Backlog", act: "Construir la landing page con IA", crit: "Header, hero, beneficios, cursos; responsive.", rol: "Frontend", link: "" },
+        { id: "S1-05", status: "Backlog", act: "Construir catálogo de cursos con tarjetas", crit: "Muestra cursos de js/datos.js y filtro funciona.", rol: "Frontend", link: "" },
+        { id: "S1-06", status: "Backlog", act: "Construir página de detalle del curso", crit: "Abre temario, instructor y botón Comprar.", rol: "Frontend", link: "" },
+        { id: "S1-07", status: "Backlog", act: "Diseñar formulario de información CRM", crit: "Valida nombre y correo.", rol: "Frontend", link: "" },
+        { id: "S1-08", status: "Backlog", act: "Publicar el sitio en GitHub Pages", crit: "El enlace público abre desde un celular.", rol: "Datos", link: "" },
+        { id: "S1-09", status: "Backlog", act: "Registrar bitácora de IA del sprint", crit: "3 prompts clave con herramienta, resultado y correcciones.", rol: "Todos", link: "" },
+        { id: "S1-10", status: "Backlog", act: "Retrospectiva del sprint 1", crit: "Demo en clase y acta de retro en /docs.", rol: "Scrum Master", link: "" },
 
-    // Sprint 3
-    { id: "S3-01", sprint: "Sprint 3 · Aula virtual", corte: "Corte 2", act: "Subir videos (YouTube no listado) y materiales (Drive)", mod: "Contenido", rol: "Product Owner", prio: "Obligatorio", tam: "M", crit: "Cada lección tiene su enlace de video o material guardado.", est: "Por hacer" },
-    { id: "S3-02", sprint: "Sprint 3 · Aula virtual", corte: "Corte 2", act: "Panel admin: crear y editar cursos", mod: "LMS", rol: "Frontend", prio: "Obligatorio", tam: "L", crit: "Un curso creado desde el panel aparece en el catálogo al publicarlo.", est: "Por hacer" },
-    { id: "S3-03", sprint: "Sprint 3 · Aula virtual", corte: "Corte 2", act: "Panel admin: crear, ordenar y editar lecciones", mod: "LMS", rol: "Frontend", prio: "Obligatorio", tam: "L", crit: "Las lecciones se muestran en el orden definido por módulo.", est: "Por hacer" },
-    { id: "S3-04", sprint: "Sprint 3 · Aula virtual", corte: "Corte 2", act: "Construir la pantalla de lección", mod: "LMS", rol: "Frontend", prio: "Obligatorio", tam: "L", crit: "Video, texto, material descargable y botones anterior y siguiente.", est: "Por hacer" },
-    { id: "S3-05", sprint: "Sprint 3 · Aula virtual", corte: "Corte 2", act: "Marcar lección como completada", mod: "LMS", rol: "Frontend", prio: "Obligatorio", tam: "M", crit: "Se guarda en progress y sigue marcada al volver a iniciar sesión.", est: "Por hacer" },
-    { id: "S3-06", sprint: "Sprint 3 · Aula virtual", corte: "Corte 2", act: "Construir Mis cursos con barra de progreso", mod: "LMS", rol: "Frontend", prio: "Obligatorio", tam: "M", crit: "El porcentaje = lecciones completadas ÷ lecciones del curso.", est: "Por hacer" },
-    { id: "S3-07", sprint: "Sprint 3 · Aula virtual", corte: "Corte 2", act: "Inscripción manual desde el panel (para pruebas)", mod: "LMS", rol: "Datos y backend", prio: "Obligatorio", tam: "S", crit: "El administrador inscribe a un usuario y este ve el curso en Mis cursos.", est: "Por hacer" },
-    { id: "S3-08", sprint: "Sprint 3 · Aula virtual", corte: "Corte 2", act: "Reglas: solo los inscritos leen las lecciones", mod: "Seguridad", rol: "Datos y backend", prio: "Obligatorio", tam: "M", crit: "Un usuario sin inscripción que copia el enlace no ve el contenido.", est: "Por hacer" },
-    { id: "S3-09", sprint: "Sprint 3 · Aula virtual", corte: "Corte 2", act: "Construir Mi perfil con historial de compras", mod: "Usuarios", rol: "Frontend", prio: "Deseable", tam: "S", crit: "Muestra nombre, correo y cursos comprados.", est: "Por hacer" },
-    { id: "S3-10", sprint: "Sprint 3 · Aula virtual", corte: "Corte 2", act: "Bitácora de IA, revisión y retrospectiva del sprint 3", mod: "Gestión ágil", rol: "Todos", prio: "Obligatorio", tam: "S", crit: "Demo en vivo y acta de retro.", est: "Por hacer" },
+        // Sprint 2
+        { id: "S2-01", status: "Backlog", act: "Crear proyecto en Firebase y registrar web", crit: "js/firebase-config.js conectado.", rol: "Datos", link: "" },
+        { id: "S2-02", status: "Backlog", act: "Activar Auth y autorizar dominio", crit: "El dominio de GitHub Pages aparece autorizado.", rol: "Datos", link: "" },
+        { id: "S2-03", status: "Backlog", act: "Construir registro e inicio de sesión", crit: "Registrarse crea documento en users.", rol: "Frontend", link: "" },
+        { id: "S2-04", status: "Backlog", act: "Header dinámico según sesión", crit: "Con sesión muestra el nombre y Salir.", rol: "Frontend", link: "" },
+        { id: "S2-05", status: "Backlog", act: "Reglas de seguridad Firestore", crit: "Un visitante no puede escribir en courses.", rol: "Datos", link: "" },
+        { id: "S2-06", status: "Backlog", act: "Cargar cursos a Firestore", crit: "Al menos 2 cursos completos.", rol: "Product Owner", link: "" },
+        { id: "S2-07", status: "Backlog", act: "Conectar catálogo a Firestore", crit: "Cambiar precio en consola se refleja en web.", rol: "Frontend", link: "" },
+        { id: "S2-08", status: "Backlog", act: "Guardar contactos en leads CRM", crit: "Cada envío crea un lead con etapa nuevo.", rol: "Frontend", link: "" },
+        { id: "S2-09", status: "Backlog", act: "Proteger admin.html", crit: "Un estudiante es redirigido al inicio.", rol: "Datos", link: "" },
+        { id: "S2-10", status: "Backlog", act: "Retrospectiva del sprint 2", crit: "Demo en vivo y acta.", rol: "Todos", link: "" },
 
-    // Sprint 4
-    { id: "S4-01", sprint: "Sprint 4 · Pagos y CRM", corte: "Corte 3", act: "Crear la cuenta de desarrollador en la pasarela, credenciales y usuarios de prueba", mod: "Pagos", rol: "Datos y backend", prio: "Obligatorio", tam: "S", crit: "Credenciales de prueba y usuarios vendedor y comprador creados.", est: "Por hacer" },
-    { id: "S4-02", sprint: "Sprint 4 · Pagos y CRM", corte: "Corte 3", act: "Apps Script: guardar la clave secreta y crear la función crearPago", mod: "Pagos", rol: "Datos y backend", prio: "Obligatorio", tam: "M", crit: "Devuelve enlace de pago con la referencia y páginas de regreso.", est: "Por hacer" },
-    { id: "S4-03", sprint: "Sprint 4 · Pagos y CRM", corte: "Corte 3", act: "Boton Comprar que llama a la API y redirige a la pasarela", mod: "Pagos", rol: "Frontend", prio: "Obligatorio", tam: "M", crit: "Al hacer clic en Comprar se abre la pantalla de pago de la pasarela.", est: "Por hacer" },
-    { id: "S4-04", sprint: "Sprint 4 · Pagos y CRM", corte: "Corte 3", act: "Construir la página de regreso (/pago-confirmado.html)", mod: "Pagos", rol: "Frontend", prio: "Obligatorio", tam: "S", crit: "Muestra mensaje de éxito o rechazo y enlace para ir al curso.", est: "Por hacer" },
-    { id: "S4-05", sprint: "Sprint 4 · Pagos y CRM", corte: "Corte 3", act: "Apps Script: recibir la notificación de la pasarela (webhook / ipn)", mod: "Pagos", rol: "Datos y backend", prio: "Obligatorio", tam: "L", crit: "La pasarela avisa a Apps Script cuando el pago es aprobado.", est: "Por hacer" },
-    { id: "S4-06", sprint: "Sprint 4 · Pagos y CRM", corte: "Corte 3", act: "Paywall automático: inscribir al estudiante al confirmar el pago", mod: "LMS", rol: "Datos y backend", prio: "Obligatorio", tam: "M", crit: "Al aprobarse el pago, se crea el documento en enrollments automáticamente.", est: "Por hacer" },
-    { id: "S4-07", sprint: "Sprint 4 · Pagos y CRM", corte: "Corte 3", act: "CRM: crear compra y mover el lead a etapa Cliente", mod: "CRM", rol: "Datos y backend", prio: "Obligatorio", tam: "M", crit: "Se crea la compra y el contacto pasa a cliente automáticamente.", est: "Por hacer" },
-    { id: "S4-08", sprint: "Sprint 4 · Pagos y CRM", corte: "Corte 3", act: "Panel CRM: vista de embudo (Kanban de contactos)", mod: "CRM", rol: "Frontend", prio: "Obligatorio", tam: "L", crit: "Muestra tarjetas de contactos por etapas: nuevo, interesado, cliente.", est: "Por hacer" },
-    { id: "S4-09", sprint: "Sprint 4 · Pagos y CRM", corte: "Corte 3", act: "Panel CRM: historial y notas de cada cliente", mod: "CRM", rol: "Frontend", prio: "Deseable", tam: "M", crit: "Al hacer clic en un contacto se abre su historial con cursos y compras.", est: "Por hacer" },
-    { id: "S4-10", sprint: "Sprint 4 · Pagos y CRM", corte: "Corte 3", act: "Probar el flujo completo de compra (de punta a punta)", mod: "Pruebas", rol: "Product Owner", prio: "Obligatorio", tam: "M", crit: "Un comprador de prueba paga, entra al curso y aparece en el CRM.", est: "Por hacer" },
-    { id: "S4-11", sprint: "Sprint 4 · Pagos y CRM", corte: "Corte 3", act: "Bitácora de IA, revisión y retrospectiva del sprint 4", mod: "Gestión ágil", rol: "Todos", prio: "Obligatorio", tam: "S", crit: "Demo en vivo del flujo completo de pago y acta de retro.", est: "Por hacer" },
+        // Sprint 3
+        { id: "S3-01", status: "Backlog", act: "Subir videos y materiales", crit: "Cada lección tiene su enlace.", rol: "Product Owner", link: "" },
+        { id: "S3-02", status: "Backlog", act: "Panel admin: crear cursos", crit: "Curso creado aparece en catálogo.", rol: "Frontend", link: "" },
+        { id: "S3-03", status: "Backlog", act: "Panel admin: ordenar lecciones", crit: "Lecciones en orden definido.", rol: "Frontend", link: "" },
+        { id: "S3-04", status: "Backlog", act: "Construir pantalla de lección", crit: "Video, texto, material descargable.", rol: "Frontend", link: "" },
+        { id: "S3-05", status: "Backlog", act: "Marcar lección como completada", crit: "Se guarda el progreso.", rol: "Frontend", link: "" },
+        { id: "S3-06", status: "Backlog", act: "Barra de progreso de Mis cursos", crit: "Porcentaje exacto de avance.", rol: "Frontend", link: "" },
+        { id: "S3-07", status: "Backlog", act: "Inscripción manual desde panel", crit: "Admin inscribe usuario para pruebas.", rol: "Datos", link: "" },
+        { id: "S3-08", status: "Backlog", act: "Bloquear lecciones a no inscritos", crit: "Usuario sin permiso no ve contenido.", rol: "Datos", link: "" },
+        { id: "S3-09", status: "Backlog", act: "Perfil con historial de compras", crit: "Muestra cursos comprados.", rol: "Frontend", link: "" },
+        { id: "S3-10", status: "Backlog", act: "Retrospectiva del sprint 3", crit: "Demo en vivo y acta.", rol: "Todos", link: "" },
 
-    // Sprint 5
-    { id: "S5-01", sprint: "Sprint 5 · Recursos y lanzamiento", corte: "Corte 3", act: "Panel admin: gestión de instructores", mod: "Recursos", rol: "Frontend", prio: "Obligatorio", tam: "M", crit: "Crear, editar y desactivar instructores con foto, bio y especialidad.", est: "Por hacer" },
-    { id: "S5-02", sprint: "Sprint 5 · Recursos y lanzamiento", corte: "Corte 3", act: "Panel admin: gestión de materiales y costos por curso", mod: "Recursos", rol: "Frontend", prio: "Obligatorio", tam: "M", crit: "Registrar materiales, licencias y honorarios de instructores por curso.", est: "Por hacer" },
-    { id: "S5-03", sprint: "Sprint 5 · Recursos y lanzamiento", corte: "Corte 3", act: "Panel admin: reporte financiero básico", mod: "Reportes", rol: "Frontend", prio: "Obligatorio", tam: "M", crit: "Muestra total vendido, costos y margen por curso.", est: "Por hacer" },
-    { id: "S5-04", sprint: "Sprint 5 · Recursos y lanzamiento", corte: "Corte 3", act: "Publicar políticas de privacidad, términos y habeas data", mod: "Legales", rol: "Product Owner", prio: "Obligatorio", tam: "S", crit: "Páginas /privacidad.html y /terminos.html visibles desde el footer.", est: "Por hacer" },
-    { id: "S5-05", sprint: "Sprint 5 · Recursos y lanzamiento", corte: "Corte 3", act: "Pruebas de usabilidad con 3 usuarios reales", mod: "Pruebas", rol: "Diseño", prio: "Obligatorio", tam: "M", crit: "Informe con 3 hallazgos y correcciones aplicadas.", est: "Por hacer" },
-    { id: "S5-06", sprint: "Sprint 5 · Recursos y lanzamiento", corte: "Corte 3", act: "Optimización y corrección de errores (bug fixing)", mod: "Calidad", rol: "Todos", prio: "Obligatorio", tam: "M", crit: "Sin errores en la consola y carga en menos de 3 segundos.", est: "Por hacer" },
-    { id: "S5-07", sprint: "Sprint 5 · Recursos y lanzamiento", corte: "Corte 3", act: "Grabar el video demo de la plataforma (3 min)", mod: "Mercadeo", rol: "Todos", prio: "Obligatorio", tam: "M", crit: "Video en YouTube con el recorrido completo de la plataforma.", est: "Por hacer" },
-    { id: "S5-08", sprint: "Sprint 5 · Recursos y lanzamiento", corte: "Corte 3", act: "Consolidar la documentación del proyecto", mod: "Documentación", rol: "Scrum Master", prio: "Obligatorio", tam: "M", crit: "README con descripción, integrantes, enlaces y guía de instalación.", est: "Por hacer" },
-    { id: "S5-09", sprint: "Sprint 5 · Recursos y lanzamiento", corte: "Corte 3", act: "Presentación final en el Demo Day", mod: "Gestión ágil", rol: "Todos", prio: "Obligatorio", tam: "M", crit: "Presentación de 10 min con pitch, demo en vivo y métricas.", est: "Por hacer" },
-    { id: "S5-10", sprint: "Sprint 5 · Recursos y lanzamiento", corte: "Corte 3", act: "Retrospectiva final del proyecto y cierre", mod: "Gestión ágil", rol: "Scrum Master", prio: "Deseable", tam: "S", crit: "Acta de retro final sobre el uso de IA y aprendizajes.", est: "Por hacer" }
-];
+        // Sprint 4
+        { id: "S4-01", status: "Backlog", act: "Credenciales de pasarela de pago", crit: "Usuarios vendedor y comprador creados.", rol: "Datos", link: "" },
+        { id: "S4-02", status: "Backlog", act: "Apps Script: crearPago", crit: "Devuelve enlace de pago.", rol: "Datos", link: "" },
+        { id: "S4-03", status: "Backlog", act: "Botón Comprar y API", crit: "Abre pantalla de pago.", rol: "Frontend", link: "" },
+        { id: "S4-04", status: "Backlog", act: "Página de regreso post-pago", crit: "Muestra éxito o rechazo.", rol: "Frontend", link: "" },
+        { id: "S4-05", status: "Backlog", act: "Notificación de pago Webhook", crit: "Pasarela avisa a Apps Script.", rol: "Datos", link: "" },
+        { id: "S4-06", status: "Backlog", act: "Paywall automático", crit: "Inscribe al estudiante al pagar.", rol: "Datos", link: "" },
+        { id: "S4-07", status: "Backlog", act: "Mover lead CRM a Cliente", crit: "Pasa a cliente tras pagar.", rol: "Datos", link: "" },
+        { id: "S4-08", status: "Backlog", act: "Panel CRM: Embudo Kanban", crit: "Tarjetas por etapas.", rol: "Frontend", link: "" },
+        { id: "S4-09", status: "Backlog", act: "Panel CRM: Historial notas", crit: "Abre historial de cliente.", rol: "Frontend", link: "" },
+        { id: "S4-10", status: "Backlog", act: "Probar flujo de compra", crit: "Comprador de prueba paga y entra.", rol: "Product Owner", link: "" },
+        { id: "S4-11", status: "Backlog", act: "Retrospectiva sprint 4", crit: "Demo y acta.", rol: "Todos", link: "" },
 
-function renderTable(data) {
-    const tbody = document.getElementById('table-body');
-    tbody.innerHTML = '';
+        // Sprint 5
+        { id: "S5-01", status: "Backlog", act: "Panel admin: Instructores", crit: "Gestión de profesores.", rol: "Frontend", link: "" },
+        { id: "S5-02", status: "Backlog", act: "Panel admin: Costos de curso", crit: "Registrar materiales y honorarios.", rol: "Frontend", link: "" },
+        { id: "S5-03", status: "Backlog", act: "Panel admin: Reporte finanzas", crit: "Total vendido y margen.", rol: "Frontend", link: "" },
+        { id: "S5-04", status: "Backlog", act: "Políticas de privacidad", crit: "Páginas publicadas.", rol: "Product Owner", link: "" },
+        { id: "S5-05", status: "Backlog", act: "Pruebas de usabilidad", crit: "3 usuarios reales lo prueban.", rol: "Diseño", link: "" },
+        { id: "S5-06", status: "Backlog", act: "Bug fixing", crit: "Carga rápido y sin errores.", rol: "Todos", link: "" },
+        { id: "S5-07", status: "Backlog", act: "Video demo de plataforma", crit: "Video YouTube 3 min.", rol: "Todos", link: "" },
+        { id: "S5-08", status: "Backlog", act: "Documentación final", crit: "README con instalación.", rol: "Scrum Master", link: "" },
+        { id: "S5-09", status: "Backlog", act: "Presentación Demo Day", crit: "Pitch y demo en vivo.", rol: "Todos", link: "" },
+        { id: "S5-10", status: "Backlog", act: "Retrospectiva y cierre", crit: "Acta final de proyecto.", rol: "Scrum Master", link: "" }
+    ];
 
-    data.forEach((t, index) => {
-        const corteClass = t.corte === 'Corte 1' ? 'badge-corte1' : (t.corte === 'Corte 2' ? 'badge-corte2' : 'badge-corte3');
-        const prioClass = t.prio === 'Obligatorio' ? 'badge-ob' : 'badge-des';
-        const statusClass = 'status-' + t.est.toLowerCase().replace(' ', '-').replace('ó', 'o');
+    function renderBoard() {
+        // Limpiar contenedores
+        const cols = {
+            "Backlog": document.querySelector('#col-backlog .cards-container'),
+            "Asignado a": document.querySelector('#col-asignado .cards-container'),
+            "En progreso": document.querySelector('#col-progreso .cards-container'),
+            "En revisión": document.querySelector('#col-revision .cards-container'),
+            "Finalizado": document.querySelector('#col-finalizado .cards-container')
+        };
 
-        const tr = document.createElement('tr');
-        tr.innerHTML = `
-            <td class="id-cell">${t.id}</td>
-            <td>${t.sprint.split('·')[0]}</td>
-            <td><span class="badge ${corteClass}">${t.corte}</span></td>
-            <td><strong>${t.act}</strong></td>
-            <td>${t.mod}</td>
-            <td>${t.rol}</td>
-            <td><span class="badge ${prioClass}">${t.prio}</span></td>
-            <td>${t.tam}</td>
-            <td class="acceptance">${t.crit}</td>
-            <td>
-                <select class="status-select ${statusClass}" onchange="updateStatus('${t.id}', this.value)">
-                    <option value="Por hacer" ${t.est === 'Por hacer' ? 'selected' : ''}>Por hacer</option>
-                    <option value="En progreso" ${t.est === 'En progreso' ? 'selected' : ''}>En progreso</option>
-                    <option value="En revisión" ${t.est === 'En revisión' ? 'selected' : ''}>En revisión</option>
-                    <option value="Hecho" ${t.est === 'Hecho' ? 'selected' : ''}>Hecho</option>
-                </select>
-            </td>
-        `;
-        tbody.appendChild(tr);
-    });
+        for(let key in cols) cols[key].innerHTML = '';
 
-    updateMetrics();
-}
-
-function updateStatus(id, newStatus) {
-    const task = tasks.find(t => t.id === id);
-    if(task) {
-        task.est = newStatus;
-        filterData();
+        // Distribuir tarjetas
+        tasks.forEach(task => {
+            if (cols[task.status]) {
+                const hasLink = task.link && task.link.trim() !== "";
+                const card = document.createElement('div');
+                card.className = 'kanban-card';
+                card.onclick = () => openModal(task.id);
+                
+                card.innerHTML = `
+                    <h4 class="card-title">${task.act}</h4>
+                    <p class="card-desc">${task.crit}</p>
+                    <div class="card-meta">
+                        <span class="card-role">${task.rol}</span>
+                        <span class="card-link-icon" style="display: ${hasLink ? 'inline' : 'none'}">📎 Entregable</span>
+                    </div>
+                    ${hasLink ? `<div class="link-display"><a href="${task.link}" target="_blank" onclick="event.stopPropagation()">Abrir enlace</a></div>` : ''}
+                `;
+                cols[task.status].appendChild(card);
+            }
+        });
     }
-}
 
-function filterData() {
-    const sprintFilter = document.getElementById('filter-sprint').value;
-    const corteFilter = document.getElementById('filter-corte').value;
-    const estadoFilter = document.getElementById('filter-estado').value;
+    function openModal(id) {
+        currentEditingId = id;
+        const task = tasks.find(t => t.id === id);
+        
+        document.getElementById('modal-title').innerText = task.act;
+        document.getElementById('modal-desc').innerText = task.crit;
+        document.getElementById('modal-status').value = task.status;
+        document.getElementById('modal-link').value = task.link || '';
+        
+        document.getElementById('editModal').style.display = 'flex';
+    }
 
-    const filtered = tasks.filter(t => {
-        const matchSprint = sprintFilter === 'ALL' || t.sprint.includes(sprintFilter);
-        const matchCorte = corteFilter === 'ALL' || t.corte === corteFilter;
-        const matchEstado = estadoFilter === 'ALL' || t.est === estadoFilter;
-        return matchSprint && matchCorte && matchEstado;
+    function closeModal() {
+        document.getElementById('editModal').style.display = 'none';
+        currentEditingId = null;
+    }
+
+    function saveCard() {
+        if (!currentEditingId) return;
+
+        const task = tasks.find(t => t.id === currentEditingId);
+        task.status = document.getElementById('modal-status').value;
+        task.link = document.getElementById('modal-link').value;
+
+        closeModal();
+        renderBoard();
+    }
+
+    // Cerrar modal si hacen click fuera de el
+    document.getElementById('editModal').addEventListener('click', function(e) {
+        if (e.target === this) closeModal();
     });
 
-    renderTable(filtered);
-}
-
-function updateMetrics() {
-    const total = tasks.length;
-    const hechas = tasks.filter(t => t.est === 'Hecho').length;
-    const progreso = tasks.filter(t => t.est === 'En progreso' || t.est === 'En revisión').length;
-    const pendientes = tasks.filter(t => t.est === 'Por hacer').length;
-    const pct = total > 0 ? Math.round((hechas / total) * 100) : 0;
-
-    document.getElementById('m-total').innerText = total;
-    document.getElementById('m-hechas').innerText = hechas;
-    document.getElementById('m-progreso').innerText = progreso;
-    document.getElementById('m-pendiente').innerText = pendientes;
-    document.getElementById('m-avance').innerText = pct + '%';
-}
-
-// Carga Inicial
-renderTable(tasks);
+    // Carga inicial
+    renderBoard();
 </script>
 
 </body>
