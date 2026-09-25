@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tablero Kanban - Equipo LMS</title>
+    <title>Tablero Kanban - Equipo LMS- AMARAM.INC </title>
     <style>
         :root {
             --bg-body: #ffffff;
@@ -34,16 +34,8 @@
             margin-bottom: 20px;
         }
 
-        .header h1 {
-            margin: 0;
-            font-size: 24px;
-        }
-
-        .header p {
-            margin: 4px 0 0 0;
-            font-size: 14px;
-            color: var(--text-muted);
-        }
+        .header h1 { margin: 0; font-size: 24px; }
+        .header p { margin: 4px 0 0 0; font-size: 14px; color: var(--text-muted); }
 
         .btn-primary {
             background-color: var(--primary);
@@ -73,16 +65,34 @@
             display: flex;
             flex-direction: column;
             gap: 12px;
+            transition: background-color 0.2s; /* Suaviza el cambio al arrastrar encima */
+        }
+
+        /* Efecto al arrastrar una tarjeta sobre la columna */
+        .kanban-column.drag-over {
+            background-color: #e5e7eb;
+            border: 2px dashed #9ca3af;
         }
 
         .kanban-column.review { background-color: var(--bg-col-review); }
+        .kanban-column.review.drag-over { background-color: #fde047; }
+
         .kanban-column.done { background-color: var(--bg-col-done); }
+        .kanban-column.done.drag-over { background-color: #bbf7d0; }
 
         .column-header {
             font-size: 14px;
             font-weight: 700;
             margin-bottom: 10px;
             color: var(--text-dark);
+        }
+
+        .cards-container {
+            flex-grow: 1; /* Permite soltar en toda el área de la columna */
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            min-height: 50px;
         }
 
         .kanban-card {
@@ -92,8 +102,12 @@
             box-shadow: 0 1px 3px rgba(0,0,0,0.1);
             border: 1px solid var(--border-card);
             border-left: 4px solid var(--card-border-left);
-            cursor: pointer;
+            cursor: grab; /* Muestra manito de agarrar */
             transition: transform 0.1s;
+        }
+
+        .kanban-card:active {
+            cursor: grabbing; /* Muestra manito cerrada al arrastrar */
         }
 
         .kanban-card:hover {
@@ -101,94 +115,31 @@
             box-shadow: 0 4px 6px rgba(0,0,0,0.1);
         }
 
+        .kanban-card.dragging {
+            opacity: 0.5; /* Tarjeta semi-transparente mientras se arrastra */
+        }
+
         .kanban-column.done .kanban-card {
             border-left-color: var(--card-border-left-done);
         }
 
-        .card-title {
-            font-size: 13px;
-            font-weight: 700;
-            margin: 0 0 6px 0;
-            line-height: 1.3;
-        }
-
-        .card-desc {
-            font-size: 12px;
-            color: var(--text-muted);
-            margin: 0 0 10px 0;
-            display: -webkit-box;
-            -webkit-line-clamp: 2;
-            -webkit-box-orient: vertical;
-            overflow: hidden;
-        }
-
-        .card-meta {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            font-size: 11px;
-        }
-
-        .card-role {
-            background: #e0e7ff;
-            color: #3730a3;
-            padding: 2px 6px;
-            border-radius: 4px;
-            font-weight: 600;
-        }
-        
-        .card-link-icon {
-            color: #059669;
-            font-weight: bold;
-            display: none;
-        }
+        .card-title { font-size: 13px; font-weight: 700; margin: 0 0 6px 0; line-height: 1.3; }
+        .card-desc { font-size: 12px; color: var(--text-muted); margin: 0 0 10px 0; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+        .card-meta { display: flex; align-items: center; justify-content: space-between; font-size: 11px; }
+        .card-role { background: #e0e7ff; color: #3730a3; padding: 2px 6px; border-radius: 4px; font-weight: 600; }
+        .card-link-icon { color: #059669; font-weight: bold; display: none; }
+        .link-display { margin-top: 10px; font-size: 12px; background: #f0fdf4; padding: 6px; border-radius: 4px; word-break: break-all; display: none; }
 
         /* Modal Styles */
-        .modal-overlay {
-            display: none;
-            position: fixed;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(0,0,0,0.5);
-            align-items: center;
-            justify-content: center;
-            z-index: 1000;
-        }
-
-        .modal {
-            background: white;
-            padding: 25px;
-            border-radius: 10px;
-            width: 100%;
-            max-width: 450px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
-        }
-
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); align-items: center; justify-content: center; z-index: 1000; }
+        .modal { background: white; padding: 25px; border-radius: 10px; width: 100%; max-width: 450px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); }
         .modal h2 { margin: 0 0 15px 0; font-size: 18px; }
-        
         .form-group { margin-bottom: 15px; }
         .form-group label { display: block; margin-bottom: 5px; font-size: 13px; font-weight: 600;}
-        .form-group select, .form-group input {
-            width: 100%;
-            padding: 8px;
-            border: 1px solid #d1d5db;
-            border-radius: 6px;
-            font-size: 14px;
-            box-sizing: border-box;
-        }
-
+        .form-group select, .form-group input { width: 100%; padding: 8px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 14px; box-sizing: border-box; }
         .modal-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px;}
         .btn-cancel { background: #f3f4f6; color: #374151; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; }
         .btn-save { background: var(--primary); color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; }
-        
-        .link-display {
-            margin-top: 10px;
-            font-size: 12px;
-            background: #f0fdf4;
-            padding: 6px;
-            border-radius: 4px;
-            word-break: break-all;
-            display: none;
-        }
     </style>
 </head>
 <body>
@@ -196,47 +147,47 @@
     <div class="header">
         <div>
             <h1>Tablero Kanban - Equipo LMS</h1>
-            <p>Desarrollo del curso de IA para creación web</p>
+            <p>Desarrollo del curso de IA para creación web (Arrastra las tarjetas para moverlas)</p>
         </div>
         <button class="btn-primary">+ Nueva Tarjeta</button>
     </div>
 
     <div class="kanban-board">
-        <!-- Columnas -->
-        <div class="kanban-column" id="col-backlog">
+        <!-- Las columnas ahora tienen el atributo de datos 'data-status' -->
+        <div class="kanban-column dropzone" data-status="Backlog" id="col-backlog">
             <div class="column-header">Backlog</div>
             <div class="cards-container"></div>
         </div>
         
-        <div class="kanban-column" id="col-asignado">
+        <div class="kanban-column dropzone" data-status="Asignado a" id="col-asignado">
             <div class="column-header">Asignado a</div>
             <div class="cards-container"></div>
         </div>
 
-        <div class="kanban-column" id="col-progreso">
+        <div class="kanban-column dropzone" data-status="En progreso" id="col-progreso">
             <div class="column-header">En progreso</div>
             <div class="cards-container"></div>
         </div>
 
-        <div class="kanban-column review" id="col-revision">
+        <div class="kanban-column review dropzone" data-status="En revisión" id="col-revision">
             <div class="column-header">En revisión 🧪</div>
             <div class="cards-container"></div>
         </div>
 
-        <div class="kanban-column done" id="col-finalizado">
+        <div class="kanban-column done dropzone" data-status="Finalizado" id="col-finalizado">
             <div class="column-header">Finalizado</div>
             <div class="cards-container"></div>
         </div>
     </div>
 
-    <!-- Modal para editar la tarjeta -->
+    <!-- Modal para editar la tarjeta (Links y Estado manual) -->
     <div class="modal-overlay" id="editModal">
         <div class="modal">
             <h2 id="modal-title">Editar Actividad</h2>
             <p id="modal-desc" style="font-size: 13px; color: #6b7280; margin-bottom: 15px;"></p>
             
             <div class="form-group">
-                <label>Mover a columna:</label>
+                <label>Estado actual (También puedes arrastrarla):</label>
                 <select id="modal-status">
                     <option value="Backlog">Backlog</option>
                     <option value="Asignado a">Asignado a</option>
@@ -259,10 +210,9 @@
     </div>
 
 <script>
-    // Variables globales
     let currentEditingId = null;
 
-    // Las 59 tareas extraídas del backlog
+    // Base de datos local (Las 59 tareas)
     const tasks = [
         // Sprint 0
         { id: "S0-01", status: "Backlog", act: "Formar el equipo y asignar roles Scrum", crit: "Acta en /docs/equipo.md con integrantes, roles y medio de contacto.", rol: "Scrum Master", link: "" },
@@ -337,7 +287,6 @@
     ];
 
     function renderBoard() {
-        // Limpiar contenedores
         const cols = {
             "Backlog": document.querySelector('#col-backlog .cards-container'),
             "Asignado a": document.querySelector('#col-asignado .cards-container'),
@@ -348,13 +297,24 @@
 
         for(let key in cols) cols[key].innerHTML = '';
 
-        // Distribuir tarjetas
         tasks.forEach(task => {
             if (cols[task.status]) {
                 const hasLink = task.link && task.link.trim() !== "";
                 const card = document.createElement('div');
                 card.className = 'kanban-card';
-                card.onclick = () => openModal(task.id);
+                card.draggable = true; // Activar drag & drop nativo
+                card.id = `card-${task.id}`;
+                
+                // Eventos para Drag and Drop
+                card.addEventListener('dragstart', handleDragStart);
+                card.addEventListener('dragend', handleDragEnd);
+                
+                // Evento para abrir modal (evitar abrir si estamos dando click al enlace)
+                card.onclick = (e) => {
+                    if(e.target.tagName !== 'A') {
+                        openModal(task.id);
+                    }
+                };
                 
                 card.innerHTML = `
                     <h4 class="card-title">${task.act}</h4>
@@ -363,12 +323,62 @@
                         <span class="card-role">${task.rol}</span>
                         <span class="card-link-icon" style="display: ${hasLink ? 'inline' : 'none'}">📎 Entregable</span>
                     </div>
-                    ${hasLink ? `<div class="link-display"><a href="${task.link}" target="_blank" onclick="event.stopPropagation()">Abrir enlace</a></div>` : ''}
+                    ${hasLink ? `<div class="link-display" style="display:block;"><a href="${task.link}" target="_blank">Abrir enlace</a></div>` : ''}
                 `;
                 cols[task.status].appendChild(card);
             }
         });
     }
+
+    // --- Lógica de Drag and Drop ---
+    
+    let draggedCardId = null;
+
+    function handleDragStart(e) {
+        draggedCardId = this.id.replace('card-', '');
+        this.classList.add('dragging');
+        e.dataTransfer.effectAllowed = 'move';
+        // Necesario para Firefox
+        e.dataTransfer.setData('text/plain', draggedCardId);
+    }
+
+    function handleDragEnd(e) {
+        this.classList.remove('dragging');
+        // Limpiar estilos de las columnas
+        document.querySelectorAll('.kanban-column').forEach(col => col.classList.remove('drag-over'));
+    }
+
+    // Configurar columnas para recibir tarjetas
+    const dropzones = document.querySelectorAll('.kanban-column.dropzone');
+    
+    dropzones.forEach(zone => {
+        zone.addEventListener('dragover', (e) => {
+            e.preventDefault(); // Necesario para permitir el "drop"
+            e.dataTransfer.dropEffect = 'move';
+            zone.classList.add('drag-over');
+        });
+
+        zone.addEventListener('dragleave', () => {
+            zone.classList.remove('drag-over');
+        });
+
+        zone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            zone.classList.remove('drag-over');
+            
+            const newStatus = zone.getAttribute('data-status');
+            
+            // Actualizar la tarea en la base de datos
+            const task = tasks.find(t => t.id === draggedCardId);
+            if(task && task.status !== newStatus) {
+                task.status = newStatus;
+                renderBoard(); // Volver a pintar la pantalla
+            }
+        });
+    });
+
+
+    // --- Lógica del Modal ---
 
     function openModal(id) {
         currentEditingId = id;
@@ -395,10 +405,10 @@
         task.link = document.getElementById('modal-link').value;
 
         closeModal();
-        renderBoard();
+        renderBoard(); // Si el estado cambió, se moverá a su nueva columna
     }
 
-    // Cerrar modal si hacen click fuera de el
+    // Cerrar modal al hacer click en fondo oscuro
     document.getElementById('editModal').addEventListener('click', function(e) {
         if (e.target === this) closeModal();
     });
