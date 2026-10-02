@@ -9,7 +9,7 @@ Este documento contiene la información base de los cursos que se ofrecerán en 
 * **Promesa:** Aprende desde cero a instalar, configurar y realizar el mantenimiento básico de aires acondicionados Mini Split, garantizando un funcionamiento óptimo, estético y seguro para emprender tu propio negocio de servicios a domicilio.
 * **Público:** Principiantes sin experiencia previa, técnicos en formación y emprendedores que buscan una nueva fuente de ingresos rápida.
 * **Precio:** $150.000 COP
-* **Instructor:** Carlos Mendoza (Técnico Certificado en Refrigeración y Climatización)
+* **Instructor:** Abraham Martínez
 
 ### Estructura del Curso
 
@@ -34,7 +34,7 @@ Este documento contiene la información base de los cursos que se ofrecerán en 
 * **Promesa:** Domina las técnicas de instalación de soportes de TV en cualquier tipo de pared y la configuración de sistemas audiovisuales, logrando acabados limpios sin cables a la vista.
 * **Público:** Entusiastas del bricolaje, técnicos de telecomunicaciones e instaladores independientes que deseen ampliar su portafolio de servicios.
 * **Precio:** $90.000 COP
-* **Instructor:** Roberto Gómez (Especialista en Instalaciones Audiovisuales y Domótica)
+* **Instructor:** Andrés Romero
 
 ### Estructura del Curso
 
