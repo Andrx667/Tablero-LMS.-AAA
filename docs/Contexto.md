@@ -1,4 +1,4 @@
-# Contexto del Proyecto: InstalaPro Academy (LMS + CRM)
+# Contexto del Proyecto: AMARAM.inc (LMS + CRM)
 
 Este documento define la ruta tecnológica, la identidad de marca y la estructura de archivos que utilizará el equipo para desarrollar la plataforma de cursos virtuales.
 
