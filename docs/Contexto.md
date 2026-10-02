@@ -3,7 +3,7 @@
 Este documento define la ruta tecnológica, la identidad de marca y la estructura de archivos que utilizará el equipo para desarrollar la plataforma de cursos virtuales.
 
 ## 1. Identidad de Marca
-* **Nombre del Proyecto:** InstalaPro Academy
+* **Nombre del Proyecto:** AMARAM.inc
 * **Nicho:** Cursos de formación técnica rápida (Instalación de Aires Acondicionados y Smart TVs).
 * **Propósito:** Brindar a principiantes y técnicos en formación los conocimientos prácticos necesarios para iniciar su propio negocio de instalaciones a domicilio.
 * **Tono de Comunicación:** Profesional, directo, práctico y motivador.
