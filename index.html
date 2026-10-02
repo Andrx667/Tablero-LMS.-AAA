@@ -224,8 +224,8 @@
 <script>
     let currentEditingId = null;
 
-    // Base de datos local (Las 59 tareas con todos sus campos)
-    const tasks = [
+    // 1. Definimos las tareas por defecto
+    const defaultTasks = [
         // Sprint 0
         { id: "S0-01", sprint: "Sprint 0", corte: "Corte 1", act: "Formar el equipo y asignar roles Scrum", mod: "Gestión ágil", rol: "Scrum Master", prio: "Obligatorio", tam: "S", crit: "Acta en /docs/equipo.md con integrantes, roles y medio de contacto.", status: "Backlog", link: "" },
         { id: "S0-02", sprint: "Sprint 0", corte: "Corte 1", act: "Crear cuentas: GitHub, Google, Pasarela y IA", mod: "Configuración", rol: "Todos", prio: "Obligatorio", tam: "S", crit: "Cada integrante confirma que entra a las cuatro herramientas.", status: "Backlog", link: "" },
@@ -298,6 +298,14 @@
         { id: "S5-10", sprint: "Sprint 5", corte: "Corte 3", act: "Retrospectiva y cierre", mod: "Gestión ágil", rol: "Scrum Master", prio: "Deseable", tam: "S", crit: "Acta final de proyecto.", status: "Backlog", link: "" }
     ];
 
+    // 2. Cargar de localStorage si existe, si no, usar las tareas por defecto
+    let tasks = JSON.parse(localStorage.getItem('lms_kanban_data')) || defaultTasks;
+
+    // 3. Función para guardar progreso
+    function saveProgress() {
+        localStorage.setItem('lms_kanban_data', JSON.stringify(tasks));
+    }
+
     function renderBoard() {
         const cols = {
             "Backlog": document.querySelector('#col-backlog .cards-container'),
@@ -368,6 +376,7 @@
             const task = tasks.find(t => t.id === draggedCardId);
             if(task && task.status !== newStatus) {
                 task.status = newStatus;
+                saveProgress(); // Guardar después de arrastrar
                 renderBoard(); 
             }
         });
@@ -409,6 +418,7 @@
         };
 
         tasks.push(newTask);
+        saveProgress(); // Guardar al crear nueva tarjeta
         closeNewCardModal();
         renderBoard();
     }
@@ -437,6 +447,7 @@
         task.status = document.getElementById('modal-status').value;
         task.link = document.getElementById('modal-link').value;
         
+        saveProgress(); // Guardar al editar tarjeta o estado
         closeEditModal();
         renderBoard();
     }
