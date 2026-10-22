@@ -63,7 +63,7 @@
 
         .nav-links {
             display: flex;
-            gap: 2rem;
+            gap: 1.5rem;
             align-items: center;
         }
 
@@ -361,15 +361,16 @@
 </head>
 <body>
 
-    <!-- Navegación -->
+    <!-- Navegación actualizada con enlaces a las páginas del repositorio -->
     <header>
         <nav>
-           <a href="#" class="logo"><img src="img/logo amaram.jpg" alt="AMARAM TV" style="height: 40px; vertical-align: middle;"> AMARAM <span>TV</span></a>
-            <div class="nav-links">
+             <a href="#" class="logo"><img src="img/logo amaram.jpg" alt="AMARAM TV" style="height: 40px; vertical-align: middle;"> AMARAM <span>TV</span></a>
+              <div class="nav-links">
                 <a href="#inicio">Inicio</a>
-                <a href="#descripcion">El Programa</a>
                 <a href="#estructura">Contenido</a>
-                <a href="#planes">Planes</a>
+                <a href="catalogo.html">Catálogo</a>
+                <a href="detalle.html">Detalle</a>
+                <a href="contacto.html">Más Info</a>
                 <button class="btn btn-outline" onclick="openLogin()">Iniciar Sesión</button>
             </div>
         </nav>
@@ -469,119 +470,3 @@
                         <ul>
                             <li>Conexión de periféricos (consolas, decodificadores).</li>
                             <li>Integración de teatros en casa y barras de sonido.</li>
-                            <li>Sintonización y configuración de red del TV.</li>
-                        </ul>
-                    </div>
-                </div>
-
-            </div>
-        </div>
-    </section>
-
-    <!-- Sección de Planes (Sin cambios, solo marca) -->
-    <section class="section-padding" id="planes">
-        <h2 class="section-title">Elige tu Plan de Estudio en AMARAM TV</h2>
-        <div class="pricing-grid">
-            
-            <!-- Plan Standard -->
-            <div class="pricing-card">
-                <div class="plan-name">Estándar</div>
-                <div class="plan-price">$90.000 <span>COP</span></div>
-                <ul class="plan-features">
-                    <li>Acceso al Curso de Montaje de Smart TVs</li>
-                    <li>Guías PDF descargables</li>
-                    <li>Acceso por 3 meses</li>
-                    <li>Soporte por correo electrónico</li>
-                </ul>
-                <button class="btn btn-outline" onclick="iniciarPago('Estándar', 90000)" style="width: 100%;">Comprar Estándar</button>
-            </div>
-
-            <!-- Plan Premium -->
-            <div class="pricing-card premium">
-                <div class="badge">MÁS VENDIDO</div>
-                <div class="plan-name">Premium</div>
-                <div class="plan-price">$150.000 <span>COP</span></div>
-                <ul class="plan-features">
-                    <li>Curso Completo de Aires Mini Split</li>
-                    <li>Curso de Montaje de Smart TVs</li>
-                    <li>Acceso ilimitado por 1 año</li>
-                    <li>Certificado de finalización</li>
-                    <li>Acceso a comunidad de instaladores</li>
-                </ul>
-                <button class="btn btn-solid" onclick="iniciarPago('Premium', 150000)" style="width: 100%;">Comprar Premium</button>
-            </div>
-
-            <!-- Plan Platino -->
-            <div class="pricing-card">
-                <div class="plan-name">Platino</div>
-                <div class="plan-price">$250.000 <span>COP</span></div>
-                <ul class="plan-features">
-                    <li>Todos los cursos actuales y futuros</li>
-                    <li>Acceso de por vida</li>
-                    <li>Asesoría 1 a 1 (1 hora al mes)</li>
-                    <li>Plantillas de cotización para clientes</li>
-                    <li>Certificado Oficial</li>
-                </ul>
-                <button class="btn btn-outline" onclick="iniciarPago('Platino', 250000)" style="width: 100%;">Comprar Platino</button>
-            </div>
-
-        </div>
-    </section>
-
-    <footer>
-        <p>&copy; 2026 AMARAM TV. Todos los derechos reservados.</p>
-    </footer>
-
-    <!-- Ventana Modal de Inicio de Sesión -->
-    <div class="modal-overlay" id="loginModal">
-        <div class="modal-content">
-            <span class="close-btn" onclick="closeLogin()">&times;</span>
-            <h3>Iniciar Sesión en AMARAM TV</h3>
-            <form onsubmit="handleLogin(event)">
-                <div class="form-group">
-                    <label>Correo Electrónico</label>
-                    <input type="email" placeholder="tu@correo.com" required>
-                </div>
-                <div class="form-group">
-                    <label>Contraseña</label>
-                    <input type="password" placeholder="••••••••" required>
-                </div>
-                <button type="submit" class="btn btn-full">Entrar a mis cursos</button>
-            </form>
-        </div>
-    </div>
-
-    <!-- Scripts de interactividad -->
-    <script>
-        const modal = document.getElementById('loginModal');
-
-        function openLogin() {
-            modal.style.display = 'flex';
-        }
-
-        function closeLogin() {
-            modal.style.display = 'none';
-        }
-
-        window.onclick = function(event) {
-            if (event.target == modal) {
-                closeLogin();
-            }
-        }
-
-        function handleLogin(e) {
-            e.preventDefault();
-            alert('¡Simulación de inicio de sesión exitosa! Más adelante conectaremos esto con Firebase.');
-            closeLogin();
-        }
-
-        function iniciarPago(plan, precio) {
-            const precioFormateado = new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP' }).format(precio);
-            
-            if(confirm(`Has seleccionado el Plan ${plan} por ${precioFormateado}.\n\n¿Deseas continuar a la pasarela de pago de AMARAM TV?`)) {
-                alert('Redirigiendo a la pasarela de pagos segura... (Simulación para el sprint actual)');
-            }
-        }
-    </script>
-</body>
-</html>
