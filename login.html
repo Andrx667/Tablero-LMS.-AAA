@@ -11,20 +11,12 @@
         .form-group { margin-bottom: 20px; }
         .form-group label { display: block; font-weight: 600; margin-bottom: 8px; font-size: 0.9rem; }
         .form-group input { width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 6px; font-size: 1rem; box-sizing: border-box; }
-        .form-group input:focus { outline: none; border-color: #0ea5e9; box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.1); }
         .btn-auth { width: 100%; background: #0284c7; color: white; border: none; padding: 12px; font-size: 1rem; font-weight: bold; border-radius: 6px; cursor: pointer; transition: background 0.3s; }
         .btn-auth:hover { background: #0369a1; }
         .toggle-link { text-align: center; margin-top: 20px; font-size: 0.9rem; color: #666; }
         .toggle-link a { color: #0284c7; text-decoration: none; font-weight: 600; cursor: pointer; }
-        .toggle-link a:hover { text-decoration: underline; }
         .volver { display: block; text-align: center; margin-top: 15px; font-size: 0.85rem; color: #888; text-decoration: none; }
-        .volver:hover { color: #333; }
     </style>
-
-    <!-- Firebase SDK v8 (Asegúrate de que coincida con la versión que usas en tu tablero) -->
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
 </head>
 <body>
 
@@ -50,12 +42,13 @@
         <a href="index.html" class="volver">← Volver al inicio</a>
     </div>
 
-    <!-- Tu archivo de configuración de Firebase -->
-    <script src="js/firebase-config.js"></script>
-    <script>
+    <!-- Script principal como módulo -->
+    <script type="module">
+        import { auth, db, createUserWithEmailAndPassword, signInWithEmailAndPassword, setDoc, doc } from "./js/firebase-config.js";
+
         let esRegistro = false;
 
-        function cambiarModo() {
+        window.cambiarModo = function() {
             esRegistro = !esRegistro;
             document.getElementById('tituloForm').innerText = esRegistro ? "Crear Cuenta" : "Iniciar Sesión";
             document.getElementById('btnAccion').innerText = esRegistro ? "Registrarse" : "Ingresar";
@@ -64,40 +57,32 @@
                 : '¿No tienes cuenta? <a onclick="cambiarModo()">Regístrate aquí</a>';
         }
 
-        document.getElementById('formAuth').addEventListener('submit', function(e) {
+        document.getElementById('formAuth').addEventListener('submit', async function(e) {
             e.preventDefault();
             const email = document.getElementById('email').value;
             const password = document.getElementById('password').value;
 
-            if (esRegistro) {
-                // Registrar nuevo usuario en Firebase Auth
-                firebase.auth().createUserWithEmailAndPassword(email, password)
-                    .then((userCredential) => {
-                        // Crear documento inicial en la colección 'users' con rol 'student'
-                        const user = userCredential.user;
-                        return db.collection("users").doc(user.uid).set({
-                            email: email,
-                            role: "student",
-                            createdAt: new Date()
-                        });
-                    })
-                    .then(() => {
-                        alert("¡Cuenta creada con éxito! Bienvenido a AMARAM TV.");
-                        window.location.href = "index.html";
-                    })
-                    .catch((error) => {
-                        alert("Error en el registro: " + error.message);
+            try {
+                if (esRegistro) {
+                    const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+                    const user = userCredential.user;
+                    
+                    // Guardar rol en Firestore
+                    await setDoc(doc(db, "users", user.uid), {
+                        email: email,
+                        role: "student",
+                        createdAt: new Date()
                     });
-            } else {
-                // Iniciar sesión
-                firebase.auth().signInWithEmailAndPassword(email, password)
-                    .then((userCredential) => {
-                        alert("¡Inicio de sesión exitoso!");
-                        window.location.href = "index.html";
-                    })
-                    .catch((error) => {
-                        alert("Error al iniciar sesión: " + error.message);
-                    });
+
+                    alert("¡Cuenta creada con éxito! Bienvenido a AMARAM TV.");
+                    window.location.href = "index.html";
+                } else {
+                    await signInWithEmailAndPassword(auth, email, password);
+                    alert("¡Inicio de sesión exitoso!");
+                    window.location.href = "index.html";
+                }
+            } catch (error) {
+                alert("Error: " + error.message);
             }
         });
     </script>
