@@ -1,9 +1,4 @@
-// Importar las funciones necesarias de los SDKs de Firebase (Versión Modular)
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-import { getFirestore, setDoc, doc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
-
-// Configuración de tu proyecto
+// Configuración de Firebase para AMARAM TV (Versión Clásica SDK v8)
 const firebaseConfig = {
     apiKey: "AIzaSyAvJK24f82Yu_N_Gny59AOC7xRUZFmruzA",
     authDomain: "amaram-tv.firebaseapp.com",
@@ -14,10 +9,11 @@ const firebaseConfig = {
     measurementId: "G-V99CZRD5R7"
 };
 
-// Inicializar Firebase
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const db = getFirestore(app);
+// Inicializar Firebase si no ha sido inicializado
+if (!firebase.apps.length) {
+    firebase.initializeApp(firebaseConfig);
+}
 
-// Exportar para usarlos en tus páginas
-export { auth, db, createUserWithEmailAndPassword, signInWithEmailAndPassword, setDoc, doc };
+// Variables globales para usar en el proyecto
+const db = firebase.firestore();
+const auth = firebase.auth();
