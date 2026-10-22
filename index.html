@@ -143,7 +143,7 @@
     let draggedCardId = null;
 
     // Escuchar la base de datos en tiempo real
-    db.collection("tareas").onSnapshot((querySnapshot) => {
+    db.collection("tareas").orderBy("id").onSnapshot((querySnapshot) => {
         tasks = [];
         querySnapshot.forEach((doc) => {
             let data = doc.data();
