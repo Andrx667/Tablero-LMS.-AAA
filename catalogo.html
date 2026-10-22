@@ -1,1 +1,159 @@
 
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Catálogo de Cursos - AMARAM TV</title>
+    <style>
+        /* Estilos alineados con tu landing page */
+        body { font-family: sans-serif; margin: 0; background-color: #f9fafb; color: #333; }
+        
+        /* Header */
+        .header-nav { display: flex; justify-content: space-between; align-items: center; padding: 15px 5%; background: #fff; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        .header-nav img { height: 40px; vertical-align: middle; }
+        .header-nav a { text-decoration: none; color: #333; font-weight: 600; margin-left: 20px; }
+        
+        .contenedor { max-width: 1200px; margin: 40px auto; padding: 0 20px; }
+        
+        h1 { text-align: center; color: #111; margin-bottom: 30px; font-size: 2.2rem; }
+
+        /* Barra de Filtros */
+        .filtros { background: #fff; padding: 15px 20px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px; flex-wrap: wrap; gap: 15px; }
+        .filtros input, .filtros select { padding: 12px; border-radius: 6px; border: 1px solid #ccc; font-size: 1rem; }
+        .filtros input { flex-grow: 1; min-width: 250px; }
+        
+        /* Grid de Tarjetas */
+        .grid-cursos { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 30px; }
+        
+        .tarjeta { background: #fff; border-radius: 10px; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.08); display: flex; flex-direction: column; transition: transform 0.2s; border: 1px solid #eee; }
+        .tarjeta:hover { transform: translateY(-5px); }
+        .tarjeta img { width: 100%; height: 200px; object-fit: cover; }
+        
+        .tarjeta-contenido { padding: 20px; display: flex; flex-direction: column; flex-grow: 1; }
+        .tarjeta-contenido h3 { margin: 0 0 10px 0; color: #111; font-size: 1.3rem; }
+        .tarjeta-contenido p { color: #666; font-size: 0.95rem; margin-bottom: 20px; line-height: 1.5; flex-grow: 1; }
+        
+        .precio-caja { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+        .precio { font-size: 1.4rem; font-weight: bold; color: #111; }
+        .precio span { font-size: 0.9rem; color: #666; font-weight: normal; }
+        
+        .btn-ver { background: #f97316; color: white; text-align: center; padding: 12px; border-radius: 6px; text-decoration: none; font-weight: bold; display: block; transition: background 0.3s; }
+        .btn-ver:hover { background: #ea580c; }
+        
+        footer { text-align: center; padding: 20px; background: #111; color: #fff; margin-top: 60px; }
+    </style>
+</head>
+<body>
+
+    <header class="header-nav">
+        <a href="index.html">
+            <img src="img/logo amaram.jpg" alt="AMARAM TV Logo">
+        </a>
+        <nav>
+            <a href="index.html">Inicio</a>
+            <a href="login.html">Ingresar</a>
+        </nav>
+    </header>
+
+    <div class="contenedor">
+        <h1>Explora Nuestros Cursos Técnicos</h1>
+
+        <!-- Controles del Filtro -->
+        <div class="filtros">
+            <input type="text" id="buscador" placeholder="🔍 Buscar curso (ej. Aires)...">
+            <div>
+                <label for="filtroCategoria" style="font-weight: 600; margin-right: 10px;">Categoría:</label>
+                <select id="filtroCategoria">
+                    <option value="todos">Todas las categorías</option>
+                    <option value="aires">Aires Acondicionados</option>
+                    <option value="tvs">Smart TVs</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Grid donde se inyectan las tarjetas -->
+        <div class="grid-cursos" id="contenedorCursos">
+            <!-- JavaScript llenará esto -->
+        </div>
+    </div>
+
+    <footer>
+        <p>© 2026 AMARAM TV. Todos los derechos reservados.</p>
+    </footer>
+
+    <script>
+        // Tus datos reales basados en la landing page
+        const cursos = [
+            {
+                id: "curso-aires",
+                titulo: "Curso Completo de Aires Mini Split",
+                descripcion: "Aprende instalación paso a paso, desde la elección de ubicación hasta el proceso de vacío y puesta en marcha.",
+                categoria: "aires",
+                precio: "150.000",
+                imagen: "img/foto aires.jpg"
+            },
+            {
+                id: "curso-tvs",
+                titulo: "Montaje de Smart TVs",
+                descripcion: "Domina el uso de soportes fijos y articulados, medición, anclaje seguro y gestión de cableado.",
+                categoria: "tvs",
+                precio: "90.000",
+                imagen: "img/foto tvs.jpg"
+            }
+        ];
+
+        const contenedor = document.getElementById('contenedorCursos');
+        const filtroCategoria = document.getElementById('filtroCategoria');
+        const buscador = document.getElementById('buscador');
+
+        // Función para dibujar las tarjetas
+        function renderizarCursos(listaCursos) {
+            contenedor.innerHTML = ''; 
+
+            if (listaCursos.length === 0) {
+                contenedor.innerHTML = '<p style="text-align: center; grid-column: 1/-1; color: #666;">No se encontraron cursos con tu búsqueda.</p>';
+                return;
+            }
+
+            listaCursos.forEach(curso => {
+                const tarjeta = `
+                    <div class="tarjeta">
+                        <img src="${curso.imagen}" alt="${curso.titulo}">
+                        <div class="tarjeta-contenido">
+                            <h3>${curso.titulo}</h3>
+                            <p>${curso.descripcion}</p>
+                            <div class="precio-caja">
+                                <div class="precio">$${curso.precio} <span>COP</span></div>
+                            </div>
+                            <a href="detalle.html" class="btn-ver">Ver Detalles del Curso</a>
+                        </div>
+                    </div>
+                `;
+                contenedor.innerHTML += tarjeta;
+            });
+        }
+
+        // Lógica del filtro
+        function aplicarFiltros() {
+            const texto = buscador.value.toLowerCase();
+            const categoria = filtroCategoria.value;
+
+            const resultados = cursos.filter(curso => {
+                const coincideTexto = curso.titulo.toLowerCase().includes(texto) || curso.descripcion.toLowerCase().includes(texto);
+                const coincideCategoria = categoria === 'todos' || curso.categoria === categoria;
+                return coincideTexto && coincideCategoria;
+            });
+
+            renderizarCursos(resultados);
+        }
+
+        // Escuchar cambios en el input y el select
+        buscador.addEventListener('input', aplicarFiltros);
+        filtroCategoria.addEventListener('change', aplicarFiltros);
+
+        // Mostrar todo al cargar la página
+        renderizarCursos(cursos);
+    </script>
+</body>
+</html>
