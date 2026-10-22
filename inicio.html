@@ -315,37 +315,6 @@
         .plan-features li { margin-bottom: 0.8rem; color: var(--gray); display: flex; align-items: center; gap: 10px; }
         .plan-features li::before { content: "✓"; color: var(--secondary); font-weight: bold; }
 
-        /* Modal de Login */
-        .modal-overlay {
-            display: none;
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(15, 23, 42, 0.8);
-            z-index: 1000;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .modal-content {
-            background: white;
-            padding: 2.5rem;
-            border-radius: 12px;
-            width: 100%;
-            max-width: 400px;
-            position: relative;
-        }
-
-        .close-btn { position: absolute; top: 15px; right: 20px; font-size: 1.5rem; cursor: pointer; color: var(--gray); }
-        .modal-content h3 { margin-bottom: 1.5rem; font-size: 1.5rem; text-align: center; }
-        
-        .form-group { margin-bottom: 1rem; }
-        .form-group label { display: block; margin-bottom: 0.5rem; font-size: 0.9rem; font-weight: 600; }
-        .form-group input { width: 100%; padding: 0.8rem; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 1rem; }
-        .form-group input:focus { outline: none; border-color: var(--primary); }
-        
-        .btn-full { width: 100%; background: var(--primary); color: white; padding: 0.8rem; font-size: 1rem; margin-top: 1rem; }
-        .btn-full:hover { background: var(--primary-hover); }
-
         /* Footer */
         footer { background: var(--dark); color: white; text-align: center; padding: 2rem; }
 
@@ -361,7 +330,7 @@
 </head>
 <body>
 
-    <!-- Navegación actualizada con enlaces a las páginas del repositorio -->
+    <!-- Navegación con enlace directo a login.html -->
     <header>
         <nav>
              <a href="#" class="logo"><img src="img/logo amaram.jpg" alt="AMARAM TV" style="height: 40px; vertical-align: middle;"> AMARAM <span>TV</span></a>
@@ -371,7 +340,8 @@
                 <a href="catalogo.html">Catálogo</a>
                 <a href="detalle.html">Detalle</a>
                 <a href="contacto.html">Más Info</a>
-                <button class="btn btn-outline" onclick="openLogin()">Iniciar Sesión</button>
+                <!-- Botón que redirige directamente al archivo de login y registro -->
+                <a href="login.html" class="btn btn-outline">Iniciar Sesión / Registrarse</a>
             </div>
         </nav>
     </header>
@@ -470,3 +440,68 @@
                         <ul>
                             <li>Conexión de periféricos (consolas, decodificadores).</li>
                             <li>Integración de teatros en casa y barras de sonido.</li>
+                            <li>Sintonización y configuración de red del TV.</li>
+                        </ul>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- Sección de Planes -->
+    <section class="section-padding" id="planes">
+        <h2 class="section-title">Elige tu Plan de Estudio en AMARAM TV</h2>
+        <div class="pricing-grid">
+            
+            <!-- Plan Standard -->
+            <div class="pricing-card">
+                <div class="plan-name">Estándar</div>
+                <div class="plan-price">$90.000 <span>COP</span></div>
+                <ul class="plan-features">
+                    <li>Acceso al Curso de Montaje de Smart TVs</li>
+                    <li>Guías PDF descargables</li>
+                    <li>Acceso por 3 meses</li>
+                    <li>Soporte por correo electrónico</li>
+                </ul>
+                <a href="login.html" class="btn btn-outline" style="width: 100%; text-align: center; display: block;">Comprar Estándar</a>
+            </div>
+
+            <!-- Plan Premium -->
+            <div class="pricing-card premium">
+                <div class="badge">MÁS VENDIDO</div>
+                <div class="plan-name">Premium</div>
+                <div class="plan-price">$150.000 <span>COP</span></div>
+                <ul class="plan-features">
+                    <li>Curso Completo de Aires Mini Split</li>
+                    <li>Curso de Montaje de Smart TVs</li>
+                    <li>Acceso ilimitado por 1 año</li>
+                    <li>Certificado de finalización</li>
+                    <li>Acceso a comunidad de instaladores</li>
+                </ul>
+                <a href="login.html" class="btn btn-solid" style="width: 100%; text-align: center; display: block;">Comprar Premium</a>
+            </div>
+
+            <!-- Plan Platino -->
+            <div class="pricing-card">
+                <div class="plan-name">Platino</div>
+                <div class="plan-price">$250.000 <span>COP</span></div>
+                <ul class="plan-features">
+                    <li>Todos los cursos actuales y futuros</li>
+                    <li>Acceso de por vida</li>
+                    <li>Asesoría 1 a 1 (1 hora al mes)</li>
+                    <li>Plantillas de cotización para clientes</li>
+                    <li>Certificado Oficial</li>
+                </ul>
+                <a href="login.html" class="btn btn-outline" style="width: 100%; text-align: center; display: block;">Comprar Platino</a>
+            </div>
+
+        </div>
+    </section>
+
+    <footer>
+        <p>&copy; 2026 AMARAM TV. Todos los derechos reservados.</p>
+    </footer>
+
+</body>
+</html>
