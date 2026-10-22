@@ -1,204 +1,32 @@
-<!-- Importamos las librerías oficiales de Firebase (Auth y Firestore) -->
-<script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-    import { getFirestore, doc, getDoc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tablero Kanban Sincronizado - Equipo LMS</title>
+    
+    <!-- SDK de Firebase (Versión 8 para compatibilidad directa en HTML) -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
 
-    // 1. Configuración de Firebase para AMARAM TV
-    const firebaseConfig = {
-  apiKey: "AIzaSyAvJK24f82Yu_N_Gny59AOC7xRUZFmruzA",
-  authDomain: "amaram-tv.firebaseapp.com",
-  projectId: "amaram-tv",
-  storageBucket: "amaram-tv.firebasestorage.app",
-  messagingSenderId: "1020922512259",
-  appId: "1:1020922512259:web:3a614d057f1cb66dcbecb6",
-  measurementId: "G-V99CZRD5R7"
-};
-
-    // Inicializamos Firebase y Firestore
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
-    const kanbanDocRef = doc(db, "kanban", "tablero_principal");
-
-    let currentEditingId = null;
-
-    // Tareas por defecto (se usan solo la primera vez si la base de datos está vacía)
-    const defaultTasks = [
-        { id: "S0-01", sprint: "Sprint 0", corte: "Corte 1", act: "Formar el equipo y asignar roles Scrum", mod: "Gestión ágil", rol: "Scrum Master", prio: "Obligatorio", tam: "S", crit: "Acta en /docs/equipo.md con integrantes, roles y medio de contacto.", status: "Finalizado", link: "docs/equipo.md" },
-        { id: "S0-04", sprint: "Sprint 0", corte: "Corte 1", act: "Crear la estructura de carpetas y archivos base", mod: "GitHub", rol: "Frontend", prio: "Obligatorio", tam: "S", crit: "Existen /css, /js, /img, /backend, /docs y archivos HTML.", status: "Finalizado", link: "" },
-        { id: "S0-06", sprint: "Sprint 0", corte: "Corte 1", act: "Elegir la ruta tecnológica y escribir CONTEXTO.md", mod: "Arquitectura", rol: "Datos y backend", prio: "Obligatorio", tam: "S", crit: "CONTEXTO.md con ruta, marca AMARAM TV, estructura.", status: "Finalizado", link: "CONTEXTO.md" },
-        { id: "S1-03", sprint: "Sprint 1", corte: "Corte 1", act: "Definir la guía de estilo de la marca y recursos", mod: "Marca", rol: "Diseño UX/UI", prio: "Obligatorio", tam: "M", crit: "Logo y portadas subidas a la carpeta /img.", status: "Finalizado", link: "img/" },
-        { id: "S2-01", sprint: "Sprint 2", corte: "Corte 2", act: "Crear proyecto en Firebase y registrar app web", mod: "Configuración", rol: "Datos y backend", prio: "Obligatorio", tam: "S", crit: "js/firebase-config.js conectado.", status: "En progreso", link: "" },
-        { id: "S2-03", sprint: "Sprint 2", corte: "Corte 2", act: "Construir registro e inicio de sesión", mod: "Usuarios", rol: "Frontend", prio: "Obligatorio", tam: "M", crit: "Modal conectado con Firebase Auth.", status: "En progreso", link: "" }
-    ];
-
-    let tasks = [];
-
-    // 2. Escuchar cambios EN TIEMPO REAL en Firebase
-    // Cada vez que tú o alguien de tu equipo mueva una tarjeta, esto actualizará la pantalla de todos automáticamente.
-    onSnapshot(kanbanDocRef, (docSnap) => {
-        if (docSnap.exists()) {
-            tasks = docSnap.data().tasks || [];
-        } else {
-            // Si es la primera vez que se ejecuta, crea el documento inicial
-            tasks = defaultTasks;
-            saveProgressToFirebase();
+    <style>
+        :root {
+            --bg-body: #ffffff; --bg-col-default: #f3f4f6; --bg-col-review: #fef08a; --bg-col-done: #dcfce7;
+            --primary: #6366f1; --primary-hover: #4f46e5; --text-dark: #1f2937; --text-muted: #6b7280;
+            --border-card: #e5e7eb; --card-border-left: #818cf8; --card-border-left-done: #34d399;
         }
-        renderBoard();
-    });
-
-    // 3. Guardar cambios directamente en la nube
-    async function saveProgressToFirebase() {
-        try {
-            await setDoc(kanbanDocRef, { tasks: tasks });
-        } catch (error) {
-            console.error("Error guardando en Firebase: ", error);
-        }
-    }
-
-    // 4. Renderizar el tablero
-    window.renderBoard = function() {
-        const cols = {
-            "Backlog": document.querySelector('#col-backlog .cards-container'),
-            "Asignado a": document.querySelector('#col-asignado .cards-container'),
-            "En progreso": document.querySelector('#col-progreso .cards-container'),
-            "En revisión": document.querySelector('#col-revision .cards-container'),
-            "Finalizado": document.querySelector('#col-finalizado .cards-container')
-        };
-
-        for(let key in cols) if(cols[key]) cols[key].innerHTML = '';
-
-        tasks.forEach(task => {
-            if (cols[task.status]) {
-                const hasLink = task.link && task.link.trim() !== "";
-                const card = document.createElement('div');
-                card.className = 'kanban-card';
-                card.draggable = true;
-                card.id = `card-${task.id}`;
-                
-                card.addEventListener('dragstart', handleDragStart);
-                card.addEventListener('dragend', handleDragEnd);
-                
-                card.onclick = (e) => {
-                    if(e.target.tagName !== 'A') openEditModal(task.id);
-                };
-                
-                card.innerHTML = `
-                    <h4 class="card-title">${task.act}</h4>
-                    <p class="card-desc">${task.crit}</p>
-                    <div class="card-meta">
-                        <span class="card-role">${task.rol || 'Sin Asignar'}</span>
-                        <span class="card-link-icon" style="display: ${hasLink ? 'inline' : 'none'}">📎 Entregable</span>
-                    </div>
-                    ${hasLink ? `<div class="link-display" style="display:block;"><a href="${task.link}" target="_blank">Abrir enlace</a></div>` : ''}
-                `;
-                cols[task.status].appendChild(card);
-            }
-        });
-    };
-
-    // --- Drag and Drop ---
-    let draggedCardId = null;
-
-    function handleDragStart(e) {
-        draggedCardId = this.id.replace('card-', '');
-        this.classList.add('dragging');
-        e.dataTransfer.effectAllowed = 'move';
-        e.dataTransfer.setData('text/plain', draggedCardId);
-    }
-
-    function handleDragEnd(e) {
-        this.classList.remove('dragging');
-        document.querySelectorAll('.kanban-column').forEach(col => col.classList.remove('drag-over'));
-    }
-
-    const dropzones = document.querySelectorAll('.kanban-column.dropzone');
-    dropzones.forEach(zone => {
-        zone.addEventListener('dragover', (e) => {
-            e.preventDefault();
-            e.dataTransfer.dropEffect = 'move';
-            zone.classList.add('drag-over');
-        });
-        zone.addEventListener('dragleave', () => zone.classList.remove('drag-over'));
-        zone.addEventListener('drop', (e) => {
-            e.preventDefault();
-            zone.classList.remove('drag-over');
-            const newStatus = zone.getAttribute('data-status');
-            const task = tasks.find(t => t.id === draggedCardId);
-            if(task && task.status !== newStatus) {
-                task.status = newStatus;
-                saveProgressToFirebase(); // Se guarda globalmente en la nube
-            }
-        });
-    });
-
-    // --- Lógica del Modal Editar ---
-    window.openEditModal = function(id) {
-        currentEditingId = id;
-        const task = tasks.find(t => t.id === id);
-        if(!task) return;
-        
-        document.getElementById('modal-title').innerText = task.act;
-        document.getElementById('modal-desc').innerText = task.crit;
-        document.getElementById('modal-status').value = task.status;
-        document.getElementById('modal-link').value = task.link || '';
-        
-        document.getElementById('editModal').style.display = 'flex';
-    };
-
-    window.closeEditModal = function() {
-        document.getElementById('editModal').style.display = 'none';
-        currentEditingId = null;
-    };
-
-    window.saveEditedCard = function() {
-        if (!currentEditingId) return;
-        const task = tasks.find(t => t.id === currentEditingId);
-        if(task) {
-            task.status = document.getElementById('modal-status').value;
-            task.link = document.getElementById('modal-link').value;
-            saveProgressToFirebase(); // Se guarda globalmente en la nube
-        }
-        closeEditModal();
-    };
-
-    // --- Lógica del Modal Crear ---
-    window.openNewCardModal = function() {
-        document.getElementById('n-id').value = `NEW-${Math.floor(Math.random()*1000)}`;
-        document.getElementById('n-act').value = '';
-        document.getElementById('n-crit').value = '';
-        document.getElementById('newCardModal').style.display = 'flex';
-    };
-
-    window.closeNewCardModal = function() {
-        document.getElementById('newCardModal').style.display = 'none';
-    };
-
-    window.saveNewCard = function() {
-        const newTask = {
-            id: document.getElementById('n-id').value || `NEW-${Math.floor(Math.random()*1000)}`,
-            sprint: "Sprint 2",
-            corte: "Corte 2",
-            status: document.getElementById('n-estado').value,
-            act: document.getElementById('n-act').value || 'Sin Título',
-            mod: document.getElementById('n-mod').value,
-            rol: document.getElementById('n-rol').value || 'Sin Asignar',
-            prio: document.getElementById('n-prio').value,
-            tam: document.getElementById('n-tam').value,
-            crit: document.getElementById('n-crit').value,
-            link: ""
-        };
-
-        tasks.push(newTask);
-        saveProgressToFirebase(); // Se guarda globalmente en la nube
-        closeNewCardModal();
-    };
-
-    document.querySelectorAll('.modal-overlay').forEach(modal => {
-        modal.addEventListener('click', function(e) {
-            if (e.target === this) {
-                this.style.display = 'none';
-                currentEditingId = null;
-            }
-        });
-    });
-</script>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background-color: var(--bg-body); color: var(--text-dark); margin: 0; padding: 20px; }
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .header h1 { margin: 0; font-size: 24px; }
+        .header p { margin: 4px 0 0 0; font-size: 14px; color: var(--text-muted); }
+        .btn-primary { background-color: var(--primary); color: white; border: none; padding: 8px 16px; border-radius: 6px; font-size: 14px; font-weight: 600; cursor: pointer; transition: background 0.2s; }
+        .btn-primary:hover { background-color: var(--primary-hover); }
+        .kanban-board { display: flex; gap: 15px; overflow-x: auto; padding-bottom: 20px; min-height: calc(100vh - 120px); }
+        .kanban-column { background-color: var(--bg-col-default); border-radius: 8px; min-width: 280px; width: 280px; padding: 15px; display: flex; flex-direction: column; gap: 12px; transition: background-color 0.2s; }
+        .kanban-column.drag-over { background-color: #e5e7eb; border: 2px dashed #9ca3af; }
+        .kanban-column.review { background-color: var(--bg-col-review); }
+        .kanban-column.review.drag-over { background-color: #fde047; }
+        .kanban-column.done { background-color: var(--bg-col-done); }
+        .kanban-column.done.drag-over { background-color: #bbf7d0; }
+        .column-header { font-size: 14px; font-weight: 700; margin-bottom: 10px; color: var(--text-dark); }
+        .cards-container { flex-grow: 1; display: flex; flex-direction
