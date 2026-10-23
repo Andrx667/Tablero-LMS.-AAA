@@ -111,6 +111,36 @@
             transform: translateY(-2px);
         }
 
+        /* Estilo para el avatar de usuario con inicial */
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            background-color: var(--primary);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.1rem;
+            cursor: pointer;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            position: relative;
+        }
+
+        .user-avatar:hover::after {
+            content: "Cerrar Sesión";
+            position: absolute;
+            bottom: -30px;
+            right: 0;
+            background: var(--dark);
+            color: white;
+            font-size: 0.75rem;
+            padding: 4px 8px;
+            border-radius: 4px;
+            white-space: nowrap;
+        }
+
         /* Secciones Generales */
         .section-padding {
             padding: 5rem 2rem;
@@ -330,7 +360,7 @@
 </head>
 <body>
 
-    <!-- Navegación con enlace directo a login.html -->
+    <!-- Navegación con contenedor dinámico para autenticación -->
     <header>
         <nav>
              <a href="#" class="logo"><img src="img/logo amaram.jpg" alt="AMARAM TV" style="height: 40px; vertical-align: middle;"> AMARAM <span>TV</span></a>
@@ -340,8 +370,10 @@
                 <a href="catalogo.html">Catálogo</a>
                 <a href="detalle.html">Detalle</a>
                 <a href="contacto.html">Más Info</a>
-                <!-- Botón que redirige directamente al archivo de login y registro -->
-                <a href="login.html" class="btn btn-outline">Iniciar Sesión / Registrarse</a>
+                <!-- Este contenedor cambia dinámicamente según la sesión -->
+                <div id="authContainer">
+                    <a href="login.html" class="btn btn-outline">Iniciar Sesión / Registrarse</a>
+                </div>
             </div>
         </nav>
     </header>
@@ -437,71 +469,3 @@
 
                     <div class="module">
                         <h4>Módulo 3: Configuración Inicial</h4>
-                        <ul>
-                            <li>Conexión de periféricos (consolas, decodificadores).</li>
-                            <li>Integración de teatros en casa y barras de sonido.</li>
-                            <li>Sintonización y configuración de red del TV.</li>
-                        </ul>
-                    </div>
-                </div>
-
-            </div>
-        </div>
-    </section>
-
-    <!-- Sección de Planes -->
-    <section class="section-padding" id="planes">
-        <h2 class="section-title">Elige tu Plan de Estudio en AMARAM TV</h2>
-        <div class="pricing-grid">
-            
-            <!-- Plan Standard -->
-            <div class="pricing-card">
-                <div class="plan-name">Estándar</div>
-                <div class="plan-price">$90.000 <span>COP</span></div>
-                <ul class="plan-features">
-                    <li>Acceso al Curso de Montaje de Smart TVs</li>
-                    <li>Guías PDF descargables</li>
-                    <li>Acceso por 3 meses</li>
-                    <li>Soporte por correo electrónico</li>
-                </ul>
-                <a href="login.html" class="btn btn-outline" style="width: 100%; text-align: center; display: block;">Comprar Estándar</a>
-            </div>
-
-            <!-- Plan Premium -->
-            <div class="pricing-card premium">
-                <div class="badge">MÁS VENDIDO</div>
-                <div class="plan-name">Premium</div>
-                <div class="plan-price">$150.000 <span>COP</span></div>
-                <ul class="plan-features">
-                    <li>Curso Completo de Aires Mini Split</li>
-                    <li>Curso de Montaje de Smart TVs</li>
-                    <li>Acceso ilimitado por 1 año</li>
-                    <li>Certificado de finalización</li>
-                    <li>Acceso a comunidad de instaladores</li>
-                </ul>
-                <a href="login.html" class="btn btn-solid" style="width: 100%; text-align: center; display: block;">Comprar Premium</a>
-            </div>
-
-            <!-- Plan Platino -->
-            <div class="pricing-card">
-                <div class="plan-name">Platino</div>
-                <div class="plan-price">$250.000 <span>COP</span></div>
-                <ul class="plan-features">
-                    <li>Todos los cursos actuales y futuros</li>
-                    <li>Acceso de por vida</li>
-                    <li>Asesoría 1 a 1 (1 hora al mes)</li>
-                    <li>Plantillas de cotización para clientes</li>
-                    <li>Certificado Oficial</li>
-                </ul>
-                <a href="login.html" class="btn btn-outline" style="width: 100%; text-align: center; display: block;">Comprar Platino</a>
-            </div>
-
-        </div>
-    </section>
-
-    <footer>
-        <p>&copy; 2026 AMARAM TV. Todos los derechos reservados.</p>
-    </footer>
-
-</body>
-</html>
