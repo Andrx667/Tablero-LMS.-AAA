@@ -106,5 +106,54 @@
             document.getElementById('formLead').reset();
         });
     </script>
+<!-- Script para conectar el formulario con Firestore -->
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const formLead = document.getElementById('formLead');
+            if (formLead) {
+                formLead.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    
+                    const nombre = document.getElementById('nombre').value;
+                    const email = document.getElementById('correo').value; // Coincide con tu id="correo"
+                    const telefono = document.getElementById('telefono').value; 
+                    const cursoInteres = document.getElementById('cursoInteres').value; 
+                    const btnEnviar = document.querySelector('button[type="submit"]');
+
+                    if (btnEnviar) {
+                        btnEnviar.innerText = "Enviando solicitud...";
+                        btnEnviar.disabled = true;
+                    }
+
+                    // Guarda el lead en Firestore con etapa 'nuevo' y origen 'formulario web'
+                    db.collection("leads").add({
+                        nombre: nombre,
+                        email: email,
+                        telefono: telefono,
+                        cursoInteres: cursoInteres,
+                        etapa: "nuevo",
+                        origen: "formulario web",
+                        createdAt: new Date()
+                    })
+                    .then(() => {
+                        alert("¡Solicitud enviada con éxito! Un asesor se pondrá en contacto contigo.");
+                        formLead.reset();
+                        if (btnEnviar) {
+                            btnEnviar.innerText = "Enviar Solicitud";
+                            btnEnviar.disabled = false;
+                        }
+                    })
+                    .catch((error) => {
+                        console.error("Error al guardar el lead:", error);
+                        alert("Hubo un error al enviar la solicitud. Inténtalo de nuevo.");
+                        if (btnEnviar) {
+                            btnEnviar.innerText = "Enviar Solicitud";
+                            btnEnviar.disabled = false;
+                        }
+                    });
+                });
+            }
+        });
+    </script>
 </body>
 </html>
