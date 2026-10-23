@@ -5,12 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AMARAM TV - Academia Técnica</title>
     
-    <!-- Fuentes y Iconos (Cargan sin bloquear la página) -->
+    <!-- Fuente Minimalista -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+    <!-- Iconos Básicos -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <style>
-        /* COLORES Y VARIABLES */
         :root {
             --primary: #0284c7; 
             --dark: #0f172a;
@@ -20,34 +20,250 @@
             --font-main: 'Inter', sans-serif;
         }
 
-        /* DISEÑO BASE MINIMALISTA */
+        /* Reseteo Básico y Limpio */
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: var(--font-main); }
         body { background-color: var(--light); color: var(--dark); line-height: 1.6; }
-        
-        /* NAVBAR ELEGANTE */
-        header { background-color: white; border-bottom: 1px solid var(--border); padding: 1rem 0; }
-        nav { max-width: 1200px; margin: 0 auto; padding: 0 2rem; display: flex; justify-content: space-between; align-items: center; }
-        .logo { font-size: 1.5rem; font-weight: 800; color: var(--dark); text-decoration: none; display: flex; align-items: center; gap: 10px; }
-        .logo img { height: 40px; border-radius: 6px; background-color: var(--light); } /* Carga el logo */
+
+        /* Navegación Minimalista */
+        header { background-color: white; border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 100; }
+        nav { max-width: 1200px; margin: 0 auto; padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; }
+        .logo { font-size: 1.5rem; font-weight: 800; color: var(--dark); text-decoration: none; display: flex; align-items: center; gap: 8px; }
         .logo span { color: var(--primary); }
         .nav-links { display: flex; gap: 2rem; align-items: center; }
         .nav-links a { text-decoration: none; color: var(--gray); font-weight: 600; }
         .nav-links a:hover { color: var(--primary); }
-
-        /* BOTONES GLOBALES */
-        .btn { padding: 0.6rem 1.5rem; border-radius: 6px; font-weight: 600; text-decoration: none; cursor: pointer; border: none; text-align: center; display: inline-block; }
+        
+        /* Botones Sencillos y Elegantes */
+        .btn { padding: 0.6rem 1.2rem; border-radius: 6px; font-weight: 600; text-decoration: none; cursor: pointer; border: none; display: inline-block; text-align: center; }
         .btn-outline { background: white; border: 2px solid var(--primary); color: var(--primary); }
         .btn-outline:hover { background: var(--light); }
         .btn-solid { background: var(--primary); color: white; border: 2px solid var(--primary); }
         .btn-solid:hover { background: #0369a1; border-color: #0369a1; }
+
+        /* Avatar de Usuario Logueado */
         .user-avatar { width: 40px; height: 40px; background-color: var(--primary); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 800; cursor: pointer; }
 
-        /* HERO SECTION (Sin imágenes de fondo complejas, puro minimalismo) */
+        /* Sección Hero */
         .hero { background-color: white; padding: 6rem 2rem; text-align: center; border-bottom: 1px solid var(--border); }
-        .hero h1 { font-size: 3.5rem; margin-bottom: 1.5rem; color: var(--dark); font-weight: 800; max-width: 900px; margin-inline: auto; line-height: 1.2; }
-        .hero p { font-size: 1.2rem; color: var(--gray); margin-bottom: 2.5rem; max-width: 600px; margin-inline: auto; }
+        .hero h1 { font-size: 3.5rem; margin-bottom: 1.5rem; color: var(--dark); font-weight: 800; line-height: 1.2; max-width: 900px; margin-left: auto; margin-right: auto; }
+        .hero p { font-size: 1.2rem; color: var(--gray); margin-bottom: 2.5rem; max-width: 600px; margin-left: auto; margin-right: auto; }
 
-        /* SECCIONES Y CONTENEDORES */
+        /* Contenedores Generales */
         .container { max-width: 1200px; margin: 0 auto; padding: 5rem 2rem; }
-        .section-title { font-size: 2.2rem; margin-bottom: 3rem; text-align: center; font-weight: 800; }
-        .grid { display: grid; grid-template-
+        .section-title { font-size: 2rem; margin-bottom: 3rem; text-align: center; font-weight: 800; }
+
+        /* Tarjetas de Cursos (Catálogo Resumen) */
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem; }
+        .card { background: white; border: 1px solid var(--border); border-radius: 8px; padding: 2rem; }
+        .card h3 { font-size: 1.5rem; margin-bottom: 1rem; display: flex; align-items: center; gap: 10px; }
+        .card p { color: var(--gray); margin-bottom: 1.5rem; }
+
+        /* Precios / Planes */
+        .pricing-card { background: white; border: 1px solid var(--border); border-radius: 8px; padding: 2.5rem; text-align: center; display: flex; flex-direction: column; }
+        .pricing-card.premium { border: 2px solid var(--primary); background-color: #f0f9ff; }
+        .price { font-size: 2.5rem; font-weight: 800; margin: 1.5rem 0; color: var(--dark); }
+        .price span { font-size: 1rem; color: var(--gray); font-weight: 400; }
+        .features { list-style: none; text-align: left; margin-bottom: 2rem; flex-grow: 1; }
+        .features li { margin-bottom: 0.8rem; color: var(--dark); display: flex; align-items: center; gap: 10px; }
+        .features i { color: var(--primary); }
+
+        /* Modal de Pago (Ventana Emergente Pura) */
+        .modal-bg { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 1000; align-items: center; justify-content: center; }
+        .modal-content { background: white; padding: 2.5rem; border-radius: 8px; width: 100%; max-width: 450px; position: relative; }
+        .close-btn { position: absolute; top: 15px; right: 20px; font-size: 1.5rem; cursor: pointer; color: var(--gray); }
+        .form-group { margin-bottom: 1rem; text-align: left; }
+        .form-group label { display: block; font-weight: 600; margin-bottom: 0.5rem; font-size: 0.9rem; }
+        .form-group input { width: 100%; padding: 0.8rem; border: 1px solid var(--border); border-radius: 6px; }
+
+        footer { background: white; border-top: 1px solid var(--border); padding: 2rem; text-align: center; color: var(--gray); margin-top: 2rem; }
+    </style>
+</head>
+<body>
+
+    <!-- Menú de Navegación -->
+    <header>
+        <nav>
+            <a href="index.html" class="logo"><i class="fa-solid fa-bolt"></i> AMARAM <span>TV</span></a>
+            <div class="nav-links">
+                <a href="#planes">Planes</a>
+                <a href="catalogo.html">Catálogo</a>
+                <a href="contacto.html">Contacto</a>
+                <!-- Contenedor Dinámico de Sesión -->
+                <div id="authContainer">
+                    <a href="login.html" class="btn btn-outline">Ingresar / Registro</a>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Sección Principal -->
+    <section class="hero">
+        <h1>Educación técnica directo al grano</h1>
+        <p>Aprende instalación profesional de Aires Acondicionados y Smart TVs de manera práctica, rápida y sin relleno. Inicia tu propio negocio hoy mismo.</p>
+        <a href="#planes" class="btn btn-solid" style="font-size: 1.1rem; padding: 0.8rem 2rem;">Ver Planes de Estudio</a>
+    </section>
+
+    <!-- Resumen del Programa -->
+    <section class="container">
+        <h2 class="section-title">Nuestros Programas</h2>
+        <div class="grid">
+            <div class="card">
+                <h3><i class="fa-solid fa-snowflake" style="color: var(--primary);"></i> Aires Mini Split</h3>
+                <p>Aprende desde el uso de herramientas, instalación de tuberías, hasta el proceso de vacío y puesta en marcha del equipo.</p>
+                <a href="catalogo.html" class="btn btn-outline">Ver en catálogo</a>
+            </div>
+            <div class="card">
+                <h3><i class="fa-solid fa-tv" style="color: var(--primary);"></i> Smart TVs</h3>
+                <p>Domina el montaje seguro en diferentes tipos de pared, gestión de cableado estético y configuración de periféricos.</p>
+                <a href="catalogo.html" class="btn btn-outline">Ver en catálogo</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Planes y Precios -->
+    <section class="container" id="planes">
+        <h2 class="section-title">Elige tu Plan</h2>
+        <div class="grid">
+            
+            <!-- Plan Básico -->
+            <div class="pricing-card">
+                <h3>Plan Estándar</h3>
+                <div class="price">$90.000 <span>COP</span></div>
+                <ul class="features">
+                    <li><i class="fa-solid fa-check"></i> Curso de Montaje de Smart TVs</li>
+                    <li><i class="fa-solid fa-check"></i> Guías descargables</li>
+                    <li><i class="fa-solid fa-check"></i> Acceso por 3 meses</li>
+                </ul>
+                <button onclick="intentarComprar('Plan Estándar', 90000)" class="btn btn-outline">Adquirir Estándar</button>
+            </div>
+
+            <!-- Plan Premium -->
+            <div class="pricing-card premium">
+                <h3 style="color: var(--primary);">Plan Premium (Recomendado)</h3>
+                <div class="price">$150.000 <span>COP</span></div>
+                <ul class="features">
+                    <li><i class="fa-solid fa-check"></i> Curso de Aires Mini Split</li>
+                    <li><i class="fa-solid fa-check"></i> Curso de Smart TVs</li>
+                    <li><i class="fa-solid fa-check"></i> Acceso de por vida</li>
+                    <li><i class="fa-solid fa-check"></i> Certificado de finalización</li>
+                </ul>
+                <button onclick="intentarComprar('Plan Premium', 150000)" class="btn btn-solid">Adquirir Premium</button>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- MODAL DE PAGO (Nativo, sin librerías) -->
+    <div class="modal-bg" id="modalPago">
+        <div class="modal-content">
+            <span class="close-btn" onclick="cerrarModal()">&times;</span>
+            <h2 style="margin-bottom: 0.5rem;">Pasarela de Pago</h2>
+            <p id="textoResumen" style="color: var(--gray); margin-bottom: 1.5rem;"></p>
+            
+            <form onsubmit="procesarPago(event)">
+                <div class="form-group">
+                    <label>Nombre del Titular</label>
+                    <input type="text" required placeholder="Ej. Andres Romero">
+                </div>
+                <div class="form-group">
+                    <label>Número de Tarjeta</label>
+                    <input type="text" required placeholder="0000 0000 0000 0000" maxlength="19">
+                </div>
+                <div style="display: flex; gap: 1rem;">
+                    <div class="form-group" style="flex: 1;">
+                        <label>Vencimiento</label>
+                        <input type="text" required placeholder="MM/AA" maxlength="5">
+                    </div>
+                    <div class="form-group" style="flex: 1;">
+                        <label>CVC</label>
+                        <input type="password" required placeholder="123" maxlength="4">
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-solid" style="width: 100%; margin-top: 1rem;" id="btnPagar">Confirmar Pago</button>
+            </form>
+        </div>
+    </div>
+
+    <footer>
+        <p>&copy; 2026 AMARAM TV. Todos los derechos reservados.</p>
+    </footer>
+
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+    <script src="js/firebase-config.js"></script> 
+
+    <!-- LÓGICA JAVASCRIPT NATIVA -->
+    <script>
+        let usuarioAutenticado = null;
+
+        document.addEventListener("DOMContentLoaded", function() {
+            const authContainer = document.getElementById('authContainer');
+
+            // 1. Detectar Sesión de Firebase
+            if (typeof auth !== 'undefined') {
+                auth.onAuthStateChanged(function(user) {
+                    usuarioAutenticado = user;
+                    if (user) {
+                        // Usuario logueado: Mostrar círculo con inicial
+                        const inicial = user.email ? user.email.charAt(0).toUpperCase() : "U";
+                        authContainer.innerHTML = `
+                            <div class="user-avatar" title="Sesión: ${user.email} (Clic para salir)" onclick="cerrarSesion()">
+                                ${inicial}
+                            </div>
+                        `;
+                    } else {
+                        // Sin sesión: Mostrar botón original
+                        authContainer.innerHTML = `<a href="login.html" class="btn btn-outline">Ingresar / Registro</a>`;
+                    }
+                });
+            }
+        });
+
+        // 2. Cerrar Sesión con alerta nativa
+        function cerrarSesion() {
+            if (confirm("¿Estás seguro de que deseas cerrar tu sesión en AMARAM TV?")) {
+                auth.signOut().then(() => {
+                    window.location.reload();
+                });
+            }
+        }
+
+        // 3. Botón de Compra con advertencia nativa si no hay sesión
+        function intentarComprar(nombrePlan, precio) {
+            if (!usuarioAutenticado) {
+                // Si no está logueado, alertar y mandar a login
+                if(confirm(`Para adquirir el ${nombrePlan} necesitas crear una cuenta primero.\n\n¿Deseas ir a la página de registro/inicio de sesión?`)) {
+                    window.location.href = 'login.html';
+                }
+            } else {
+                // Si está logueado, abrir la ventana de pago
+                document.getElementById('textoResumen').innerText = `Estás a punto de adquirir el ${nombrePlan} por un total de $${precio.toLocaleString()} COP.`;
+                document.getElementById('modalPago').style.display = 'flex';
+            }
+        }
+
+        // 4. Cerrar Ventana de Pago
+        function cerrarModal() {
+            document.getElementById('modalPago').style.display = 'none';
+        }
+
+        // 5. Simular Procesamiento del Banco
+        function procesarPago(e) {
+            e.preventDefault();
+            const btn = document.getElementById('btnPagar');
+            btn.innerText = "Procesando...";
+            btn.disabled = true;
+            
+            // Simular espera de 2 segundos
+            setTimeout(() => {
+                alert("¡Transacción exitosa! El curso ha sido agregado a tu cuenta.");
+                cerrarModal();
+                window.location.href = 'catalogo.html'; // Redirige al catálogo de cursos
+            }, 2000);
+        }
+    </script>
+
+</body>
+</html>
