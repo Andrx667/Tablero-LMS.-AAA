@@ -1,1 +1,115 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Detalle del Curso - AMARAM TV</title>
+    <style>
+        :root {
+            --primary: #0284c7;
+            --primary-hover: #0369a1;
+            --secondary: #f97316;
+            --dark: #1e293b;
+            --light: #f8fafc;
+            --gray: #64748b;
+            --font-main: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
 
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: var(--font-main); }
+        body { background-color: var(--light); color: var(--dark); line-height: 1.6; }
+
+        /* Navbar */
+        header { background-color: #ffffff; box-shadow: 0 2px 10px rgba(0,0,0,0.1); position: sticky; top: 0; z-index: 100; }
+        nav { max-width: 1200px; margin: 0 auto; padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; }
+        .logo { font-size: 1.5rem; font-weight: 800; color: var(--dark); text-decoration: none; display: flex; align-items: center; gap: 8px; }
+        .logo span { color: var(--primary); }
+        .nav-links { display: flex; gap: 1.5rem; align-items: center; }
+        .nav-links a { text-decoration: none; color: var(--gray); font-weight: 600; transition: color 0.3s; }
+        .nav-links a:hover { color: var(--primary); }
+        .btn { padding: 0.6rem 1.2rem; border-radius: 6px; font-weight: 600; text-decoration: none; cursor: pointer; border: none; }
+        .btn-outline { background: transparent; border: 2px solid var(--primary); color: var(--primary); }
+        .btn-outline:hover { background: var(--primary); color: white; }
+
+        /* Contenido de Detalle */
+        .detalle-container { max-width: 1000px; margin: 3rem auto; padding: 0 2rem; }
+        .curso-card-detalle { background: white; border-radius: 12px; padding: 3rem; box-shadow: 0 4px 20px rgba(0,0,0,0.05); border-top: 6px solid var(--primary); }
+        h1 { font-size: 2.5rem; color: var(--dark); margin-bottom: 1rem; }
+        .descripcion { font-size: 1.1rem; color: var(--gray); margin-bottom: 2rem; }
+        .precio-box { font-size: 2rem; font-weight: 800; color: var(--primary); margin-bottom: 2rem; }
+        .btn-comprar { background: var(--secondary); color: white; padding: 1rem 2rem; font-size: 1.1rem; border-radius: 8px; font-weight: bold; border: none; cursor: pointer; transition: background 0.3s; }
+        .btn-comprar:hover { background: #ea580c; }
+        .volver { display: inline-block; margin-top: 2rem; color: var(--gray); text-decoration: none; font-weight: 600; }
+        .volver:hover { color: var(--dark); }
+
+        footer { background: var(--dark); color: white; text-align: center; padding: 2rem; margin-top: 4rem; }
+    </style>
+</head>
+<body>
+
+    <header>
+        <nav>
+            <a href="index.html" class="logo">AMARAM <span>TV</span></a>
+            <div class="nav-links">
+                <a href="index.html">Inicio</a>
+                <a href="catalogo.html">Catálogo</a>
+                <a href="login.html" class="btn btn-outline">Iniciar Sesión</a>
+            </div>
+        </nav>
+    </header>
+
+    <div class="detalle-container">
+        <div class="curso-card-detalle" id="contenidoCurso">
+            <h1 id="tituloCurso">Cargando curso...</h1>
+            <p class="descripcion" id="descCurso">Por favor espere mientras obtenemos la información desde la base de datos.</p>
+            <div class="precio-box" id="precioCurso">$0 COP</div>
+            <button class="btn-comprar" onclick="inscribirse()">Inscribirme al Curso</button>
+        </div>
+        <a href="index.html" class="volver">← Volver al inicio</a>
+    </div>
+
+    <footer>
+        <p>&copy; 2026 AMARAM TV. Todos los derechos reservados.</p>
+    </footer>
+
+    <!-- SDKs de Firebase v8 (Clásico) -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+
+    <!-- Archivo de configuración -->
+    <script src="js/firebase-config.js"></script>
+
+    <!-- Lógica para leer el curso desde Firestore -->
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            // Obtener el ID del curso de la URL (Ejemplo: detalle.html?id=curso-aires)
+            const params = new URLSearchParams(window.location.search);
+            const cursoId = params.get('id') || 'curso-aires'; // Por defecto muestra aires si no hay ID
+
+            db.collection("courses").doc(cursoId).get().then((doc) => {
+                if (doc.exists) {
+                    const data = doc.data();
+                    document.getElementById('tituloCurso').innerText = data.title;
+                    document.getElementById('descCurso').innerText = data.description;
+                    document.getElementById('precioCurso').innerText = `$${Number(data.price).toLocaleString()} COP`;
+                } else {
+                    document.getElementById('tituloCurso').innerText = "Curso no encontrado";
+                    document.getElementById('descCurso').innerText = "Lo sentimos, el curso que buscas no existe en nuestra base de datos.";
+                    document.getElementById('precioCurso').style.display = "none";
+                }
+            }).catch((error) => {
+                console.error("Error obteniendo el curso:", error);
+            });
+        });
+
+        function inscribirse() {
+            if (typeof auth !== 'undefined' && auth.currentUser) {
+                alert("¡Te has inscrito con éxito al curso!");
+            } else {
+                alert("Debes iniciar sesión para inscribirte en los cursos.");
+                window.location.href = "login.html";
+            }
+        }
+    </script>
+</body>
+</html>
