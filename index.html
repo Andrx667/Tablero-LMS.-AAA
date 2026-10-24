@@ -66,7 +66,7 @@
     <header>
         <nav>
             <a href="index.html" class="logo">
-                <img src="img/logo%20amaram.jpg" alt="Logo AMARAM TV">
+                <img src="img/logo%20amaram.jpg" alt="Logo AMARAM TV" onerror="this.src='https://via.placeholder.com/40'">
                 AMARAM <span>TV</span>
             </a>
             <div class="nav-links">
@@ -90,13 +90,13 @@
         <h2 class="section-title">Nuestros Cursos</h2>
         <div class="grid">
             <div class="card">
-                <img src="img/foto%20aires.jpg" alt="Curso Aires Mini Split">
+                <img src="img/foto%20aires.jpg" alt="Curso Aires Mini Split" onerror="this.src='https://via.placeholder.com/400x220'">
                 <h3><i class="fa-solid fa-snowflake" style="color: var(--primary);"></i> Aires Mini Split</h3>
                 <p>Domina el uso de herramientas, instalación de tuberías, proceso de vacío y puesta en marcha de manera segura.</p>
                 <a href="catalogo.html" class="btn btn-outline" style="width: 100%;">Ver en catálogo</a>
             </div>
             <div class="card">
-                <img src="img/foto%20tvs.jpg" alt="Curso Smart TVs">
+                <img src="img/foto%20tvs.jpg" alt="Curso Smart TVs" onerror="this.src='https://via.placeholder.com/400x220'">
                 <h3><i class="fa-solid fa-tv" style="color: var(--primary);"></i> Smart TVs</h3>
                 <p>Aprende el montaje en distintos tipos de pared, gestión de cableado estético y configuración de teatros en casa.</p>
                 <a href="catalogo.html" class="btn btn-outline" style="width: 100%;">Ver en catálogo</a>
@@ -155,10 +155,9 @@
     <!-- SDKs de Firebase v8 -->
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
     <script src="js/firebase-config.js"></script> 
 
-    <!-- LÓGICA DE LA INTERFAZ Y PASARELA WOMPI -->
+    <!-- LÓGICA DE INTERFAZ Y PASARELA WOMPI CORREGIDA -->
     <script>
         let usuarioAutenticado = null;
 
@@ -176,6 +175,8 @@
                         `;
                     }
                 });
+            } else {
+                console.error("Firebase no cargó correctamente.");
             }
         });
 
@@ -187,34 +188,47 @@
 
         function abrirCheckoutWompi(nombrePlan, precio) {
             if (!usuarioAutenticado) {
-                if(confirm(`Para adquirir el ${nombrePlan} necesitas iniciar sesión o crear una cuenta primero.\n\n¿Deseas ir a la página de registro?`)) {
+                if(confirm(`Para adquirir "${nombrePlan}" necesitas iniciar sesión o crear una cuenta primero.\n\n¿Deseas ir a la página de registro?`)) {
                     window.location.href = 'login.html';
                 }
                 return;
             }
 
-            const precioEnCentavos = precio * 100;
-            const referenciaUnica = "AMARAM-" + Date.now();
+            if (typeof WidgetCheckout === 'undefined') {
+                alert("Error: La pasarela no cargó. Revisa tu conexión a internet o desactiva tu bloqueador de anuncios.");
+                return;
+            }
 
-            var checkout = new WidgetCheckout({
-                currency: 'COP',
-                amountInCents: precioEnCentavos,
-                reference: referenciaUnica,
-                publicKey: 'pub_prod_gWmfm8lNUNDZW2XoU5uDA0vSFkr7e7m2', 
-                redirectUrl: window.location.origin + window.location.pathname.replace("index.html", "") + "catalogo.html",
-                customerData: {
-                    email: usuarioAutenticado.email,
-                    fullName: usuarioAutenticado.displayName || "Estudiante AMARAM"
-                }
-            });
+            try {
+                const precioEnCentavos = precio * 100;
+                const referenciaUnica = "AMARAM-" + Date.now();
 
-            checkout.open(function ( result ) {
-                var transaction = result.transaction;
-                if (transaction.status === 'APPROVED') {
-                    alert("¡Pago Exitoso! Tu curso ha sido activado en tu cuenta.");
-                    window.location.href = 'catalogo.html';
-                }
-            });
+                var checkout = new WidgetCheckout({
+                    currency: 'COP',
+                    amountInCents: precioEnCentavos,
+                    reference: referenciaUnica,
+                    publicKey: 'pub_prod_gWmfm8lNUNDZW2XoU5uDA0vSFkr7e7m2', // Llave de producción
+                    customerData: {
+                        email: usuarioAutenticado.email,
+                        fullName: "Estudiante AMARAM"
+                    }
+                });
+
+                checkout.open(function ( result ) {
+                    var transaction = result.transaction;
+                    if (transaction.status === 'APPROVED') {
+                        alert("¡Pago Exitoso! Tu curso ha sido activado.");
+                        window.location.reload();
+                    } else if (transaction.status === 'DECLINED') {
+                        alert("El banco rechazó la transacción. Intenta con otro método de pago.");
+                    } else {
+                        console.log("Transacción cerrada o pendiente.");
+                    }
+                });
+            } catch (error) {
+                console.error("Fallo al ejecutar Wompi:", error);
+                alert("Hubo un error al conectar con la pasarela de pagos.");
+            }
         }
     </script>
 </body>
