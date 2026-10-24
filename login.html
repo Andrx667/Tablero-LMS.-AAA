@@ -84,13 +84,15 @@
         </div>
     </div>
 
-    <!-- SDKs de Firebase v8 -->
+    <!-- 1. PRIMERO: El núcleo de Firebase -->
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+
+    <!-- 2. SEGUNDO: Los servicios (Auth y Firestore) -->
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
-    
-    <!-- TU ARCHIVO DE CONFIGURACIÓN -->
-    <script src="js/firebase-config.js"></script> 
+
+    <!-- 3. TERCERO Y ÚLTIMO: Tu archivo de configuración -->
+    <script src="js/firebase-config.js"></script>
 
     <script>
         let esRegistro = false;
