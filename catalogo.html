@@ -117,11 +117,15 @@
     <!-- SCRIPT OFICIAL DE WOMPI -->
     <script type="text/javascript" src="https://checkout.wompi.co/widget.js"></script>
 
-    <!-- SDKs de Firebase v8 -->
+  <!-- 1. PRIMERO: El núcleo de Firebase -->
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
-    <script src="js/firebase-config.js"></script> 
 
+    <!-- 2. SEGUNDO: Los servicios (Auth y Firestore) -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+
+    <!-- 3. TERCERO Y ÚLTIMO: Tu archivo de configuración -->
+    <script src="js/firebase-config.js"></script>
     <!-- LÓGICA DE INTERFAZ Y PASARELA WOMPI CORREGIDA -->
     <script>
         let usuarioAutenticado = null;
