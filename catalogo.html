@@ -164,39 +164,37 @@
             }
 
             if (typeof WidgetCheckout === 'undefined') {
-                alert("Error: La pasarela no cargó. Revisa tu conexión a internet o desactiva tu bloqueador de anuncios.");
+                alert("Error: La pasarela de Wompi no cargó. Revisa tu conexión a internet.");
                 return;
             }
 
             try {
-                const precioEnCentavos = precio * 100;
+                // Wompi exige que la cantidad en centavos sea estrictamente un número entero
+                const precioEnCentavos = parseInt(precio) * 100;
                 const referenciaUnica = "AMARAM-" + Date.now();
 
                 var checkout = new WidgetCheckout({
                     currency: 'COP',
                     amountInCents: precioEnCentavos,
                     reference: referenciaUnica,
-                    publicKey: 'pub_prod_gWmfm8lNUNDZW2XoU5uDA0vSFkr7e7m2', // Llave de producción
+                    publicKey: 'pub_prod_gWmfm8lNUNDZW2XoU5uDA0vSFkr7e7m2',
+                    redirectUrl: window.location.href, // URL de retorno segura
                     customerData: {
                         email: usuarioAutenticado.email,
-                        fullName: "Estudiante AMARAM"
+                        fullName: usuarioAutenticado.displayName || "Estudiante AMARAM"
                     }
                 });
 
                 checkout.open(function ( result ) {
                     var transaction = result.transaction;
-                    if (transaction.status === 'APPROVED') {
+                    if (transaction && transaction.status === 'APPROVED') {
                         alert("¡Pago Exitoso! Tu curso ha sido activado.");
                         window.location.reload();
-                    } else if (transaction.status === 'DECLINED') {
-                        alert("El banco rechazó la transacción. Intenta con otro método de pago.");
-                    } else {
-                        console.log("Transacción cerrada o pendiente.");
                     }
                 });
             } catch (error) {
-                console.error("Fallo al ejecutar Wompi:", error);
-                alert("Hubo un error al conectar con la pasarela de pagos.");
+                console.error("Error al abrir Wompi:", error);
+                alert("Ocurrió un error al iniciar la pasarela de pagos.");
             }
         }
     </script>
