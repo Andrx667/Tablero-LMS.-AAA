@@ -44,7 +44,7 @@
         .toggle-form { text-align: center; margin-top: 1.5rem; font-size: 0.9rem; color: var(--gray); }
         .toggle-form span { color: var(--primary); font-weight: 600; cursor: pointer; }
         
-        .error-msg { color: #dc2626; font-size: 0.85rem; margin-top: 1rem; text-align: center; display: none; }
+        .error-msg { background: #ffeeec; color: #dc2626; padding: 0.8rem; border-radius: 6px; font-size: 0.85rem; margin-top: 1rem; text-align: center; display: none; border: 1px solid #fca5a5; }
     </style>
 </head>
 <body>
@@ -52,7 +52,7 @@
     <header>
         <nav>
             <a href="index.html" class="logo">
-                <img src="img/logo%20amaram.jpg" alt="Logo AMARAM TV">
+                <img src="img/logo%20amaram.jpg" alt="Logo AMARAM TV" onerror="this.src='https://via.placeholder.com/40'">
                 AMARAM <span>TV</span>
             </a>
             <a href="index.html" style="color: var(--gray); text-decoration: none; font-weight: 600;"><i class="fa-solid fa-arrow-left"></i> Volver al inicio</a>
@@ -60,7 +60,6 @@
     </header>
 
     <div class="auth-container">
-        <!-- Formulario de Inicio de Sesión / Registro -->
         <div class="auth-card">
             <h2 id="authTitle">Iniciar Sesión</h2>
             <p id="authSubtitle">Accede a tus cursos y herramientas</p>
@@ -85,49 +84,55 @@
         </div>
     </div>
 
-   <!-- SDKs de Firebase v8 -->
+    <!-- SDKs de Firebase v8 -->
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
     
     <!-- TU ARCHIVO DE CONFIGURACIÓN -->
-    <script src="js/firebase-config.js"></script>
+    <script src="js/firebase-config.js"></script> 
+
     <script>
         let esRegistro = false;
 
-        // Alternar entre modo Login y Registro
         function cambiarModo() {
             esRegistro = !esRegistro;
             document.getElementById('authTitle').innerText = esRegistro ? "Crear Cuenta" : "Iniciar Sesión";
             document.getElementById('authSubtitle').innerText = esRegistro ? "Únete a AMARAM TV" : "Accede a tus cursos y herramientas";
             document.getElementById('authBtn').innerText = esRegistro ? "Registrarse" : "Ingresar";
             document.getElementById('toggleText').innerHTML = esRegistro 
-                ? '¿Ya tienes cuenta? <span onclick="cambiarModo()">Inicia sesión</span>'
-                : '¿No tienes cuenta? <span onclick="cambiarModo()">Regístrate aquí</span>';
+                ? '¿Ya tienes cuenta? <span onclick="cambiarModo()" style="color:var(--primary); font-weight:600; cursor:pointer;">Inicia sesión</span>'
+                : '¿No tienes cuenta? <span onclick="cambiarModo()" style="color:var(--primary); font-weight:600; cursor:pointer;">Regístrate aquí</span>';
             document.getElementById('errorMsg').style.display = 'none';
         }
 
-        // Procesar formulario con Firebase
         function procesarAuth(e) {
             e.preventDefault();
-            const email = document.getElementById('email').value;
-            const password = document.getElementById('password').value;
+            
+            const email = document.getElementById('email').value.trim();
+            const password = document.getElementById('password').value.trim();
             const btn = document.getElementById('authBtn');
             const errorMsg = document.getElementById('errorMsg');
             
+            errorMsg.style.display = 'none';
+
+            if (typeof auth === 'undefined') {
+                errorMsg.style.display = 'block';
+                errorMsg.innerText = "Error: La variable 'auth' no está definida en firebase-config.js";
+                return;
+            }
+
             btn.innerText = "Procesando...";
             btn.disabled = true;
-            errorMsg.style.display = 'none';
 
             if (esRegistro) {
                 // REGISTRO
                 auth.createUserWithEmailAndPassword(email, password)
                     .then((userCredential) => {
-                        // Redirección directa al catálogo tras registrarse
                         window.location.href = 'catalogo.html';
                     })
                     .catch((error) => {
-                        mostrarError(error.code);
+                        mostrarError(error);
                         btn.innerText = "Registrarse";
                         btn.disabled = false;
                     });
@@ -135,17 +140,33 @@
                 // INICIO DE SESIÓN
                 auth.signInWithEmailAndPassword(email, password)
                     .then((userCredential) => {
-                        // Redirección directa al catálogo tras ingresar
                         window.location.href = 'catalogo.html';
                     })
                     .catch((error) => {
-                        mostrarError(error.code);
+                        mostrarError(error);
                         btn.innerText = "Ingresar";
                         btn.disabled = false;
                     });
             }
         }
 
-        // Manejo de errores comunes
-        function mostrarError(codigo) {
+        function mostrarError(error) {
             const errorMsg = document.getElementById('errorMsg');
+            errorMsg.style.display = 'block';
+            
+            const codigo = error.code;
+            if (codigo === 'auth/user-not-found' || codigo === 'auth/wrong-password' || codigo === 'auth/invalid-credential') {
+                errorMsg.innerText = "Correo o contraseña incorrectos.";
+            } else if (codigo === 'auth/email-already-in-use') {
+                errorMsg.innerText = "Este correo ya está registrado. Intenta iniciar sesión.";
+            } else if (codigo === 'auth/weak-password') {
+                errorMsg.innerText = "La contraseña debe tener al menos 6 caracteres.";
+            } else if (codigo === 'auth/invalid-email') {
+                errorMsg.innerText = "El formato del correo electrónico no es válido.";
+            } else {
+                errorMsg.innerText = "Error: " + error.message;
+            }
+        }
+    </script>
+</body>
+</html>
