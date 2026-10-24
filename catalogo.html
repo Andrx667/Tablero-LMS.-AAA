@@ -21,7 +21,6 @@
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: var(--font-main); }
         body { background-color: var(--light); color: var(--dark); line-height: 1.6; }
         
-        /* NAVBAR */
         header { background-color: white; border-bottom: 1px solid var(--border); padding: 1rem 0; position: sticky; top: 0; z-index: 100; }
         nav { max-width: 1200px; margin: 0 auto; padding: 0 2rem; display: flex; justify-content: space-between; align-items: center; }
         .logo { font-size: 1.5rem; font-weight: 800; color: var(--dark); text-decoration: none; display: flex; align-items: center; gap: 10px; }
@@ -38,12 +37,10 @@
         .btn-solid:hover { background: #0369a1; border-color: #0369a1; }
         .user-avatar { width: 40px; height: 40px; background-color: var(--primary); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 800; cursor: pointer; }
 
-        /* HEADER DEL CATÁLOGO */
         .catalog-header { background-color: white; padding: 4rem 2rem; text-align: center; border-bottom: 1px solid var(--border); }
         .catalog-header h1 { font-size: 2.8rem; margin-bottom: 1rem; color: var(--dark); font-weight: 800; }
         .catalog-header p { font-size: 1.1rem; color: var(--gray); max-width: 600px; margin: 0 auto; }
 
-        /* GRID DE CURSOS */
         .container { max-width: 1200px; margin: 0 auto; padding: 4rem 2rem; }
         .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 2.5rem; }
 
@@ -66,7 +63,7 @@
     <header>
         <nav>
             <a href="index.html" class="logo">
-                <img src="img/logo%20amaram.jpg" alt="Logo AMARAM TV">
+                <img src="img/logo%20amaram.jpg" alt="Logo AMARAM TV" onerror="this.src='https://via.placeholder.com/40'">
                 AMARAM <span>TV</span>
             </a>
             <div class="nav-links">
@@ -88,9 +85,8 @@
     <section class="container">
         <div class="grid">
             
-            <!-- CURSO 1: SMART TVS (ESTÁNDAR) -->
             <div class="course-card">
-                <img src="img/foto%20tvs.jpg" alt="Montaje de Smart TVs">
+                <img src="img/foto%20tvs.jpg" alt="Montaje de Smart TVs" onerror="this.src='https://via.placeholder.com/400x200'">
                 <div class="course-content">
                     <span class="badge">NIVEL BÁSICO</span>
                     <h3>Montaje Profesional de Smart TVs</h3>
@@ -100,9 +96,8 @@
                 </div>
             </div>
 
-            <!-- CURSO 2: AIRES ACONDICIONADOS (PREMIUM) -->
             <div class="course-card" style="border: 2px solid var(--primary);">
-                <img src="img/foto%20aires.jpg" alt="Aires Mini Split">
+                <img src="img/foto%20aires.jpg" alt="Aires Mini Split" onerror="this.src='https://via.placeholder.com/400x200'">
                 <div class="course-content">
                     <span class="badge" style="background: var(--primary); color: white; border: none;">MÁS VENDIDO</span>
                     <h3>Instalación de Aires Mini Split + Smart TVs</h3>
@@ -127,7 +122,7 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
     <script src="js/firebase-config.js"></script> 
 
-    <!-- LÓGICA DE INTERFAZ Y PASARELA WOMPI -->
+    <!-- LÓGICA DE INTERFAZ Y PASARELA WOMPI CORREGIDA -->
     <script>
         let usuarioAutenticado = null;
 
@@ -145,6 +140,8 @@
                         `;
                     }
                 });
+            } else {
+                console.error("Firebase no cargó correctamente.");
             }
         });
 
@@ -162,31 +159,41 @@
                 return;
             }
 
-            const precioEnCentavos = precio * 100;
-            const referenciaUnica = "AMARAM-" + Date.now();
+            if (typeof WidgetCheckout === 'undefined') {
+                alert("Error: La pasarela no cargó. Revisa tu conexión a internet o desactiva tu bloqueador de anuncios.");
+                return;
+            }
 
-            var checkout = new WidgetCheckout({
-                currency: 'COP',
-                amountInCents: precioEnCentavos,
-                reference: referenciaUnica,
-                
-                // Llave pública de producción confirmada en el panel
-                publicKey: 'pub_prod_gWmfm8lNUNDZW2XoU5uDA0vSFkr7e7m2', 
-                
-                redirectUrl: window.location.origin + window.location.pathname.replace("catalogo.html", "") + "catalogo.html",
-                customerData: {
-                    email: usuarioAutenticado.email,
-                    fullName: usuarioAutenticado.displayName || "Estudiante AMARAM"
-                }
-            });
+            try {
+                const precioEnCentavos = precio * 100;
+                const referenciaUnica = "AMARAM-" + Date.now();
 
-            checkout.open(function ( result ) {
-                var transaction = result.transaction;
-                if (transaction.status === 'APPROVED') {
-                    alert("¡Pago Exitoso! Tu curso ha sido activado en tu cuenta.");
-                    window.location.reload();
-                }
-            });
+                var checkout = new WidgetCheckout({
+                    currency: 'COP',
+                    amountInCents: precioEnCentavos,
+                    reference: referenciaUnica,
+                    publicKey: 'pub_prod_gWmfm8lNUNDZW2XoU5uDA0vSFkr7e7m2', // Llave de producción
+                    customerData: {
+                        email: usuarioAutenticado.email,
+                        fullName: "Estudiante AMARAM"
+                    }
+                });
+
+                checkout.open(function ( result ) {
+                    var transaction = result.transaction;
+                    if (transaction.status === 'APPROVED') {
+                        alert("¡Pago Exitoso! Tu curso ha sido activado.");
+                        window.location.reload();
+                    } else if (transaction.status === 'DECLINED') {
+                        alert("El banco rechazó la transacción. Intenta con otro método de pago.");
+                    } else {
+                        console.log("Transacción cerrada o pendiente.");
+                    }
+                });
+            } catch (error) {
+                console.error("Fallo al ejecutar Wompi:", error);
+                alert("Hubo un error al conectar con la pasarela de pagos.");
+            }
         }
     </script>
 </body>
